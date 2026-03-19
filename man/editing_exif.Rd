@@ -7,20 +7,22 @@
 editing_exif(
   files,
   metadata,
-  extra_tags,
+  extra_tags = NULL,
   overwrite_original = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
-\item{files}{a character vector of paths with complete file.names like what
+\item{files}{a character vector of paths with complete file names like what
 \code{\link{list.files}} when used with `full.names = TRUE` or
 \code{\link[tools:fileutils]{tools::list_files_with_exts}} gives}
 
 \item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
 \code{\link{parsing_custom}} or \code{\link{parsing_json}}.}
 
-\item{extra_tags}{A Named vector of exif tags to modify.}
+\item{extra_tags}{A named character vector of additional exif tags to write
+for every file, e.g. `c(Artist = "Jane Smith", Copyright = "2024 Jane Smith")`.
+These are appended to the per-shot metadata tags.}
 
 \item{overwrite_original}{logical, if TRUE, no copy is created by `exiftool`. See <https://exiftool.org/forum/index.php?topic=13191.msg71304#msg71304>}
 
@@ -40,16 +42,18 @@ metadata <- reading_nossaflex("tests/testthat/testdata/nossaflex_filenames.txt")
     parsing_nossaflex()
 editing_exif(files, metadata)
 
-metadata <- data.table::data.table(NO = c(1, 2), SS = c(2s, 4000), A = c(1.4, 2.8),
- FL = c(50, 50), EX = c("+2", "-1"),
- Northing = c("N", "N"), Easting = c("E", "E"),
- Latitude = c(54.321, 54.321), Longitude = c(12.345, 12.345),
- Date_Time_Original = c("2024-03-19 21:40:40 +0000", "2024-04-20 12:20:10 +0000"),
- Camera_Brand = c("Nikon", "Nikon"), Camera_Model = c("FA", "FA"),
- Lens_Brand = c("Nikon", "Nikon"),
- Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
- Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
+metadata <- data.frame(
+  NO = c(1, 2), SS = c("2s", "4000"), A = c(1.4, 2.8),
+  FL = c(50, 50), EX = c("+2", "-1"),
+  Northing = c("N", "N"), Easting = c("E", "E"),
+  Latitude = c(54.321, 54.321), Longitude = c(12.345, 12.345),
+  Date_Time_Original = c("2024-03-19 21:40:40 +0000", "2024-04-20 12:20:10 +0000"),
+  Camera_Brand = c("Nikon", "Nikon"), Camera_Model = c("FA", "FA"),
+  Lens_Brand = c("Nikon", "Nikon"),
+  Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
+  Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
 )
+editing_exif(files, metadata, extra_tags = c(Artist = "Jane Smith"))
 }
 
 

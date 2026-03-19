@@ -14,7 +14,6 @@ the package, type citation("APMD").
 Useful links:
 \itemize{
   \item \url{https://github.com/albansagouis/APMD/}
-  \item \url{https://nossaflex.io/}
   \item Report bugs at \url{https://github.com/albansagouis/APMD/issues}
 }
 

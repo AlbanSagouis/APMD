@@ -1,3 +1,33 @@
+---
+output: github_document
+---
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "inst/figures/README-",
+  out.width = "100%"
+)
+library(covr)
+coverage <- floor(percent_coverage(package_coverage()))
+
+# Create badge colour based on coverage
+if (coverage >= 90) {
+  colour <- "brightgreen"
+} else if (coverage >= 80) {
+  colour <- "green"
+} else if (coverage >= 70) {
+  colour <- "yellowgreen"
+} else if (coverage >= 60) {
+  colour <- "yellow"
+} else if (coverage >= 50) {
+  colour <- "orange"
+} else {
+  colour <- "red"
+}
+```
 
 <!-- <img src="inst/figures/stopmotion.png" width="120" align="right" /> -->
 
@@ -6,18 +36,15 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml)
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
-![Code Coverage:
-98%](https://img.shields.io/badge/code_coverage-98%25-brightgreen)
+[![Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+![Code Coverage: `r coverage`%](https://img.shields.io/badge/code_coverage-`r coverage`%25-`r colour`)
 <!-- badges: end -->
 
 ## Analog Photography MetaData
 
-The APMD package is the entry of the NOSSAFLEX file naming convention
-into the R universe to help scientific, professional or amateur
-photographers to name their picture files consistently and
+The APMD package is the entry of the NOSSAFLEX file naming
+convention into the R universe to help scientific, professional or
+amateur photographers to name their picture files consistently and
 informatively.
 
 When taking a picture with an analog camera, data such as aperture,
@@ -30,11 +57,9 @@ data quality.
 
 Here is an explanation from the creators:
 
-> It’s as easy as the name – NOSSAFLEX has all of the information in the
-> title.
+> It’s as easy as the name – NOSSAFLEX has all of the information in the title.
 >
-> NO = Number SS = Shutter Speed A = Aperture FL = Focal Length EX =
-> Exposure
+> NO = Number SS = Shutter Speed A = Aperture FL = Focal Length EX = Exposure
 
 NOSSAFLEX file names looks like this: `NO03_SS250_A8_FL80_EX0.jpg` or
 this: `NO34_SS30_A2.8_FL35_EX+1.tiff`!
@@ -50,12 +75,12 @@ Here are the main functions in the package:
   `DSC_00345.jpg` to information-rich NOSSAFLEX name based on data
   provided by the user, see {analog} section:
   `NO03_SS250_A8_FL80_EX0.jpg`.
-- `parsing_json` and `parsing_frames` parse data in JSON format as
-  exported by the analog™ app and Frames™ app respectively.
+- `parsing_json` and `parsing_frames` parse data in JSON format as exported by
+  the analog&trade; app and Frames&trade; app respectively.
 - `editing_exif` batch-saves the metadata of the pictures into the exif
   slots of the scan files (jpg, tiff, etc).
 
-## Analog™, Datafilm™, Frames™ or an other app
+## Analog&trade;, Datafilm&trade;, Frames&trade; or an other app
 
 ## The workflow
 
@@ -73,9 +98,7 @@ remotes::install_github(
 ```
 
 ### Usage
-
 #### Renaming files
-
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
@@ -100,11 +123,11 @@ editing_exif(files, metadata)
 
 ## Related work
 
-The package relies heavily on the great `exiftoolr`
-{<https://github.com/JoshOBrien/exiftoolr/>} package by @JoshOBrien
-which itself depends on the great `exiftool` {<https://exiftool.org/>}
-software by Phil Harvey. Finally, jExifToolGUI
-{<https://github.com/hvdwolf/jExifToolGUI>} offers exif editing and with
-a Graphical Interface, nice. And for Apple users, the Frames™ iPhone and
-Mac apps allow integrated shot metadata recording and including the
-metadata in the exif slots with a great GUI.
+The package relies heavily on the great
+`exiftoolr` {<https://github.com/JoshOBrien/exiftoolr/>} package by
+@JoshOBrien which itself depends on the great
+`exiftool` {<https://exiftool.org/>} software by Phil Harvey. Finally,
+jExifToolGUI {<https://github.com/hvdwolf/jExifToolGUI>} offers exif
+editing and with a Graphical Interface, nice. And for Apple users, the
+Frames&trade; iPhone and Mac apps allow integrated shot metadata recording and
+including the metadata in the exif slots with a great GUI.

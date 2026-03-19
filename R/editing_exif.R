@@ -2,7 +2,9 @@
 #' @inheritParams renaming_nossaflex
 #' @param metadata a data.frame as provided by \code{\link{parsing_nossaflex}},
 #' \code{\link{parsing_custom}} or \code{\link{parsing_json}}.
-#' @param extra_tags A Named vector of exif tags to modify.
+#' @param extra_tags A named character vector of additional exif tags to write
+#'   for every file, e.g. `c(Artist = "Jane Smith", Copyright = "2024 Jane Smith")`.
+#'   These are appended to the per-shot metadata tags.
 #' @param overwrite_original logical, if TRUE, no copy is created by `exiftool`. See <https://exiftool.org/forum/index.php?topic=13191.msg71304#msg71304>
 #' @param verbose passes `-v2` argument to `exiftool`
 #' @details
@@ -18,16 +20,18 @@
 #'     parsing_nossaflex()
 #' editing_exif(files, metadata)
 #'
-#' metadata <- data.table::data.table(NO = c(1, 2), SS = c(2s, 4000), A = c(1.4, 2.8),
-#'  FL = c(50, 50), EX = c("+2", "-1"),
-#'  Northing = c("N", "N"), Easting = c("E", "E"),
-#'  Latitude = c(54.321, 54.321), Longitude = c(12.345, 12.345),
-#'  Date_Time_Original = c("2024-03-19 21:40:40 +0000", "2024-04-20 12:20:10 +0000"),
-#'  Camera_Brand = c("Nikon", "Nikon"), Camera_Model = c("FA", "FA"),
-#'  Lens_Brand = c("Nikon", "Nikon"),
-#'  Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
-#'  Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
+#' metadata <- data.frame(
+#'   NO = c(1, 2), SS = c("2s", "4000"), A = c(1.4, 2.8),
+#'   FL = c(50, 50), EX = c("+2", "-1"),
+#'   Northing = c("N", "N"), Easting = c("E", "E"),
+#'   Latitude = c(54.321, 54.321), Longitude = c(12.345, 12.345),
+#'   Date_Time_Original = c("2024-03-19 21:40:40 +0000", "2024-04-20 12:20:10 +0000"),
+#'   Camera_Brand = c("Nikon", "Nikon"), Camera_Model = c("FA", "FA"),
+#'   Lens_Brand = c("Nikon", "Nikon"),
+#'   Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
+#'   Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
 #' )
+#' editing_exif(files, metadata, extra_tags = c(Artist = "Jane Smith"))
 #' }
 #'
 #'
@@ -42,7 +46,7 @@
 editing_exif <- function(
   files,
   metadata,
-  extra_tags,
+  extra_tags = NULL,
   overwrite_original = FALSE,
   verbose = TRUE
 ) {
@@ -78,6 +82,7 @@ editing_exif <- function(
     "Lens_Brand",
     "Lens_Model",
     "Lens_Focal_Length",
+    "Lens_Max_Focal_Length",
     "Lens_Maximum_Aperture",
     # Nikon lens
     "Nikon:LensIDNumber",
@@ -124,6 +129,7 @@ editing_exif <- function(
     "LensMake",
     "LensModel",
     "MaxFocalLength",
+    "MaxFocalLength",
     "MaxApertureValue",
     # Nikon lens
     "Nikon:LensIDNumber",
@@ -153,49 +159,46 @@ editing_exif <- function(
   # Converting values ----
   ## Excluding "auto" values ----
   variables <- c("SS", "FL", "A")
-  if (any(metadata[j = ..variables] == "auto")) {
+  if (any(metadata[, variables, with = FALSE] == "auto")) {
     message('"auto" values in SS, A and FL are turned into "".')
-    metadata[
-      j = (variables) := lapply(
-        .SD,
-        function(SDcolumn)
-          base::replace(
-            x = SDcolumn,
-            list = grep(
-              pattern = "auto",
-              x = SDcolumn,
-              fixed = TRUE
-            ),
-            values = ""
-          )
-      ),
-      .SDcols = variables
-    ]
+    for (col in variables) {
+      vals <- metadata[[col]]
+      auto_idx <- grep("auto", vals, fixed = TRUE)
+      if (length(auto_idx) > 0L) {
+        data.table::set(metadata, i = auto_idx, j = col, value = "")
+      }
+    }
   }
 
-  ## ShutterSpeedValue ----
-  metadata[
-    j = "SS" := data.table::fcase(
-      grepl("/", x = SS, fixed = TRUE),
-      SS,
-      grepl("s", x = SS, fixed = TRUE),
-      sub("s", "", x = SS, fixed = TRUE),
-      !is.na(as.numeric(SS)),
-      as.character(1 / as.numeric(SS)),
+  ## ShutterSpeedValue and ExposureTime ----
+  # Capture original SS before transformation — ExposureTime needs it
+  original_SS <- metadata[["SS"]]
+
+  data.table::set(
+    x = metadata,
+    j = "SS",
+    value = data.table::fcase(
+      grepl("/", original_SS, fixed = TRUE), original_SS,
+      grepl("s", original_SS, fixed = TRUE), sub("s", "", original_SS, fixed = TRUE),
+      !is.na(as.numeric(original_SS)), as.character(1 / as.numeric(original_SS)),
       default = ""
     )
-  ]
-  ## ExposureTime & ShutterSpeed----
-  metadata[
-    j = "ExposureTime" := data.table::fcase(
-      grepl("/", x = SS, fixed = TRUE),
-      (1 / sub("1/", "", ExposureTime, fixed = TRUE) |> as.integer()) |>
-        as.character(),
-      grepl("s", x = SS, fixed = TRUE),
-      sub("s", "", x = SS, fixed = TRUE),
+  )
+
+  # ExposureTime: decimal seconds derived from the original SS string
+  data.table::set(
+    x = metadata,
+    j = "ExposureTime",
+    value = data.table::fcase(
+      grepl("/", x = original_SS, fixed = TRUE),
+      (1 / as.integer(sub("1/", "", original_SS, fixed = TRUE))) |> as.character(),
+      grepl("s", x = original_SS, fixed = TRUE),
+      sub("s", "", x = original_SS, fixed = TRUE),
+      !is.na(suppressWarnings(as.numeric(original_SS))),
+      as.character(1 / as.numeric(original_SS)),
       default = ""
     )
-  ]
+  )
 
   # if aperture is auto and SS no, mode is S
   # if aperture and SS is auto, mode is P
@@ -205,27 +208,35 @@ editing_exif <- function(
   for (i in seq_along(files)) {
     arguments <- metadata[i, ]
 
-    arguments <- stats::setNames(
-      object = arguments,
-      exif_names[match(
-        x = names(arguments),
-        table = exif_tags,
-        nomatch = 0L
-      )]
-    )
-    arguments <- sapply(
+    matched_idx <- match(x = names(arguments), table = exif_tags, nomatch = NA_integer_)
+    arguments <- arguments[, !is.na(matched_idx), with = FALSE]
+    matched_idx <- matched_idx[!is.na(matched_idx)]
+
+    arguments <- stats::setNames(object = arguments, exif_names[matched_idx])
+
+    shot_args <- sapply(
       seq_along(arguments),
       function(j)
         stringi::stri_join("-", names(arguments)[[j]], "=", arguments[[j]])
     )
 
-    if (isTRUE(overwrite_original)) arguments <- c("-overwrite_original", arguments)
+    extra_args <- if (!is.null(extra_tags)) {
+      sapply(
+        seq_along(extra_tags),
+        function(j)
+          stringi::stri_join("-", names(extra_tags)[[j]], "=", extra_tags[[j]])
+      )
+    }
 
-    if (isTRUE(verbose)) arguments <- c("-v2", arguments)
+    all_args <- c(shot_args, extra_args)
 
-    print(arguments)
+    if (isTRUE(overwrite_original)) all_args <- c("-overwrite_original", all_args)
 
-    exiftoolr::exif_call(path = files[[i]], args = arguments, quiet = FALSE)
+    if (isTRUE(verbose)) all_args <- c("-v2", all_args)
+
+    print(all_args)
+
+    exiftoolr::exif_call(path = files[[i]], args = all_args, quiet = FALSE)
   }
 }
 

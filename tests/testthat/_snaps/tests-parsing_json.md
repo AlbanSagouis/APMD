@@ -41,6 +41,7 @@
       34: FA and filters - Berlin         003        Nikon           FA    34 1/4000
       35: FA and filters - Berlin         003        Nikon           FA    35  1/250
                         Roll_Name Roll_Number Camera_Brand Camera_Model    NO     SS
+                           <char>      <char>       <char>       <char> <int> <char>
                A     FL        Lens_Brand Lens_Maximum_Aperture Lens_Focal_Length
           <char> <char>            <char>                <char>            <char>
        1:   f/11     50 Nikon Nikkor AF d                   1.4                50
@@ -79,6 +80,7 @@
       34:  f/1.4     50 Nikon Nikkor AF d                   1.4                50
       35:  f/5.6     50 Nikon Nikkor AF d                   1.4                50
                A     FL        Lens_Brand Lens_Maximum_Aperture Lens_Focal_Length
+          <char> <char>            <char>                <char>            <char>
               EX        Date_Time_Original           Latitude          Longitude
           <char>                    <char>             <char>             <char>
        1:      0 2024-02-23 10:46:49 +0000 52.482086181640625 13.442915896422404
@@ -117,6 +119,7 @@
       34:     +1 2024-05-09 11:48:24 +0000 52.493621826171875 13.445331752312784
       35:     +1 2024-05-21 09:46:33 +0000  52.48004150390625  13.43682688662171
               EX        Date_Time_Original           Latitude          Longitude
+          <char>                    <char>             <char>             <char>
           Northing Easting
             <char>  <char>
        1:        N       E
@@ -155,4 +158,5 @@
       34:        N       E
       35:        N       E
           Northing Easting
+            <char>  <char>
 

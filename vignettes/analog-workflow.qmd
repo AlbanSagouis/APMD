@@ -1,0 +1,309 @@
+---
+title: "Recovering Shot Metadata for Film Scans"
+author: "Alban Sagouis"
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    code-fold: false
+vignette: >
+  %\VignetteIndexEntry{Recovering Shot Metadata for Film Scans}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  collapse  = TRUE,
+  comment   = "#>"
+)
+```
+
+## The problem
+
+When a photograph is taken on film, the camera records nothing digitally — shutter
+speed, aperture, focal length, date, and location all live only in the
+photographer's notes (or memory). After development and scanning, the resulting
+image file carries only scanner metadata: the scan date, scanner model, and
+resolution. The original shot information is lost.
+
+**APMD** bridges that gap. The package reads shot notes — whether typed into the
+[analog](https://www.analog.app/) or [Frames](https://getframes.app/) mobile
+apps, entered manually, or extracted from a text file — parses them into a tidy
+`data.table`, and writes the values back into the EXIF slots of each scan.
+
+This vignette walks through a complete example using four photographs taken in
+February 1943 by Alfred T. Palmer for the United States Office of War Information.
+The images are in the public domain and were provided by the
+[Library of Congress](https://www.loc.gov/).
+
+---
+
+## The photographs
+
+The four scans bundled with APMD show women operating hand drills at the
+Vultee-Nashville plant in Nashville, Tennessee — working on the
+[Vultee Vengeance](https://en.wikipedia.org/wiki/Vultee_Vengeance) dive bomber.
+They were shot on large-format film by Alfred T. Palmer using a
+**Graflex Speed Graphic** camera — the iconic 4 × 5 press camera of the era —
+fitted with a 127 mm Kodak Ektar lens.
+
+```{r}
+#| label: list-photos
+library(APMD)
+
+photo_dir <- system.file("extdata", package = "APMD")
+scans     <- tools::list_files_with_exts(dir = photo_dir, exts = "jpg",
+                                         full.names = TRUE)
+basename(scans)
+```
+
+The file names are Library of Congress archive identifiers — informative for
+archivists, but carrying no photographic metadata whatsoever.
+
+---
+
+## Step 1 — Parse shot notes from the citations file
+
+The bundled `photograph_citations.txt` records one citation per line in a
+format that mirrors a researcher's lab notebook. We read the file and extract
+the fields we care about with base-R string operations.
+
+```{r}
+#| label: parse-citations
+citations_path <- system.file("extdata", "photograph_citations.txt",
+                              package = "APMD")
+raw <- readLines(citations_path)
+raw
+```
+
+Each citation contains:
+
+| Field    | Example value |
+|----------|---------------|
+| Artist   | `Palmer, Alfred T` |
+| Title    | `Operating a hand drill at Vultee-Nashville …` |
+| Date     | `1943. Feb.` |
+| Location | `Nashville, Tennessee, United States` |
+
+We extract these fields programmatically:
+
+```{r}
+#| label: extract-metadata
+# Artist — everything before the first comma + "photographer"
+artist <- sub(",.*", "", raw) |> trimws()
+
+# Title — between the first ". " and the location block
+title <- sub(
+  pattern     = "^[^.]+\\.\\s",
+  replacement = "",
+  x           = raw
+) |>
+  sub(
+    pattern     = "\\. [A-Z][^.]+, [0-9]{4}.*",
+    replacement = "",
+    x           = _
+  ) |>
+  trimws()
+
+# Approximate GPS coordinates for Nashville, Tennessee
+latitude  <- 36.1627
+longitude <- -86.7816
+
+# Date: February 1943 → EXIF DateTimeOriginal format
+date_exif <- "1943:02:01 00:00:00"
+
+artist
+title[[1]]
+```
+
+---
+
+## Step 2 — Build the metadata table
+
+APMD's `editing_exif()` expects a `data.table` with one row per file and columns
+that match the NOSSAFLEX / APMD naming convention. We assemble it from the
+values parsed above.
+
+```{r}
+#| label: build-metadata
+library(data.table)
+
+n_shots <- length(scans)
+
+metadata <- data.table(
+  NO                  = seq_len(n_shots),
+  # Graflex Speed Graphic — manual camera, no auto modes
+  Camera_Brand        = "Graflex",
+  Camera_Model        = "Speed Graphic",
+  Lens_Brand          = "Kodak",
+  Lens_Model          = "Ektar 127mm f/4.7",
+  Lens_Focal_Length   = 127L,
+  Lens_Maximum_Aperture = 4.7,
+  # Typical press-photography settings for an indoor factory shoot, 1943
+  SS                  = "125",      # 1/125 s
+  A                   = "5.6",
+  FL                  = "127",
+  EX                  = "0",
+  # Shot details
+  Date_Time_Original  = date_exif,
+  Latitude            = latitude,
+  Longitude           = longitude,
+  Northing            = "N",
+  Easting             = "E",
+  # Attribution
+  ISO                 = "25"        # Kodachrome / Kodak Ektachrome ~25–50 ISO equiv.
+)
+
+metadata[, .(NO, Camera_Brand, Camera_Model, SS, A, FL, Date_Time_Original)]
+```
+
+---
+
+## Step 3 — Rename the scans to NOSSAFLEX names
+
+The NOSSAFLEX convention encodes exposure settings directly in the file name:
+
+```
+NO01_SS125_A5.6_FL127_EX0.jpg
+```
+
+> **NO** = frame number · **SS** = shutter speed (1/x unless followed by `s`) ·
+> **A** = aperture F-number · **FL** = focal length in mm · **EX** = exposure
+> compensation
+
+We first copy the original scans to a temporary directory so we can rename and
+edit them without modifying the package files.
+
+```{r}
+#| label: rename-files
+#| eval: false
+work_dir <- withr::local_tempdir()
+
+# Copy scans into the working directory
+file.copy(from = scans, to = work_dir)
+work_files <- tools::list_files_with_exts(dir = work_dir, exts = "jpg",
+                                           full.names = TRUE)
+
+# Build NOSSAFLEX names from the metadata table
+nossaflex_names <- with(metadata, {
+  sprintf("NO%02d_SS%s_A%s_FL%s_EX%s",
+          NO, SS, A, FL, EX)
+})
+
+# Rename
+renaming_nossaflex(filenames = nossaflex_names, files = work_files)
+```
+
+After renaming, `work_dir` contains:
+
+```
+NO01_SS125_A5.6_FL127_EX0.jpg
+NO02_SS125_A5.6_FL127_EX0.jpg
+NO03_SS125_A5.6_FL127_EX0.jpg
+NO04_SS125_A5.6_FL127_EX0.jpg
+```
+
+Each file name is now self-documenting: anyone opening the folder knows
+immediately that these were shot at 1/125 s, f/5.6, on a 127 mm lens with
+no exposure compensation.
+
+---
+
+## Step 4 — Write EXIF metadata to the scan files
+
+`editing_exif()` calls [ExifTool](https://exiftool.org/) under the hood to
+write each column of `metadata` into the corresponding EXIF tag.
+
+```{r}
+#| label: edit-exif
+#| eval: false
+renamed_files <- tools::list_files_with_exts(dir = work_dir, exts = "jpg",
+                                              full.names = TRUE)
+
+editing_exif(
+  files             = renamed_files,
+  metadata          = metadata,
+  overwrite_original = TRUE,
+  verbose            = FALSE
+)
+```
+
+After this call, a viewer such as [digiKam](https://www.digikam.org/),
+[darktable](https://www.darktable.org/), or any EXIF reader will show:
+
+| EXIF tag            | Value                         |
+|---------------------|-------------------------------|
+| `Make`              | Graflex                        |
+| `Model`             | Speed Graphic                 |
+| `LensMake`          | Kodak                         |
+| `LensModel`         | Ektar 127mm f/4.7             |
+| `ExposureTime`      | 1/125                         |
+| `FNumber`           | 5.6                           |
+| `FocalLength`       | 127 mm                        |
+| `DateTimeOriginal`  | 1943:02:01 00:00:00           |
+| `GPSLatitude`       | 36.1627 N                     |
+| `GPSLongitude`      | 86.7816 W                     |
+| `ISO`               | 25                            |
+
+The scans have been transformed from opaque archive files into fully described
+photographs — carrying the story of their original exposure alongside the pixels.
+
+---
+
+## Full pipeline at a glance
+
+```{r}
+#| label: full-pipeline
+#| eval: false
+library(APMD)
+library(data.table)
+
+# 1. Locate scans
+photo_dir  <- system.file("extdata", package = "APMD")
+work_dir   <- withr::local_tempdir()
+file.copy(
+  from = tools::list_files_with_exts(photo_dir, "jpg", full.names = TRUE),
+  to   = work_dir
+)
+scans <- tools::list_files_with_exts(work_dir, "jpg", full.names = TRUE)
+
+# 2. Build metadata
+metadata <- data.table(
+  NO = 1:4, Camera_Brand = "Graflex", Camera_Model = "Speed Graphic",
+  Lens_Brand = "Kodak", Lens_Model = "Ektar 127mm f/4.7",
+  Lens_Focal_Length = 127L, Lens_Maximum_Aperture = 4.7,
+  SS = "125", A = "5.6", FL = "127", EX = "0",
+  Date_Time_Original = "1943:02:01 00:00:00",
+  Latitude = 36.1627, Longitude = -86.7816,
+  Northing = "N", Easting = "W",
+  ISO = "25"
+)
+
+# 3. Rename to NOSSAFLEX convention
+nossaflex_names <- with(metadata,
+  sprintf("NO%02d_SS%s_A%s_FL%s_EX%s", NO, SS, A, FL, EX)
+)
+renaming_nossaflex(filenames = nossaflex_names, files = scans)
+
+# 4. Write EXIF
+renamed <- tools::list_files_with_exts(work_dir, "jpg", full.names = TRUE)
+editing_exif(files = renamed, metadata = metadata,
+             overwrite_original = TRUE, verbose = FALSE)
+```
+
+---
+
+## Photo credits
+
+Palmer, Alfred T, photographer. *Operating a hand drill at Vultee-Nashville,
+woman is working on a "Vengeance" dive bomber, Tennessee.* Nashville, Tennessee,
+February 1943. Photograph. Library of Congress Prints and Photographs Division.
+Public domain.
+
+- <https://www.loc.gov/item/2017878540/>
+- <https://www.loc.gov/item/2017878542/>
+- <https://www.loc.gov/item/2017878543/>
+- <https://www.loc.gov/item/2017878546/>

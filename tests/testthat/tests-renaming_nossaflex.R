@@ -12,7 +12,7 @@ testthat::test_that("renaming works as expected", {
             to = test_files)
   filenames <- reading_nossaflex(path = testthat::test_path("testdata", "nossaflex_filenames.txt"))
 
-  renaming_nossaflex(filenames = filenames, files = test_files, copy = FALSE)
+  renaming_nossaflex(files = test_files, filenames = filenames, copy = FALSE)
 
   checkmate::expect_file_exists(x = paste0(dirname(test_files), "/",
                                            filenames,

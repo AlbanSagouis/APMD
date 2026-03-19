@@ -1,8 +1,14 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
-tests
+^tests$
 ^LICENSE\.md$
 ^codemeta\.json$
 .github
 ^\.github$
 ^README\.Rmd$
+^README\.html$
+^\.claude$
+^\.github$
+^\.agents$
+^doc$
+^Meta$

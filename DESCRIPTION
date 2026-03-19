@@ -3,7 +3,7 @@ Type: Package
 Title: Analog Photography MetaData - Edit Exif Data of Pictures
 Version: 0.1.9004
 Author: c(
-  person("Alban", "Sagouis", role = c("aut","cre"),
+  person("Alban", "Sagouis", role = c("aut", "cre", "cph"),
         email = "sagouis@pm.me",
         comment = c(ORCID = "0000-0002-3827-1063")))
 Maintainer: Alban Sagouis <sagouis@pm.me>
@@ -11,17 +11,17 @@ Description: Photographs taken on film, then developed and then
     scanned are lacking important metadata or if they have, it's from the
     scanning device, not the original camera.
     The APMD package takes NOSSAFLEX structured file names
-    and can 1) batch rename corresponding pictures and 2) edit their exif data
+    and can 1. batch rename corresponding pictures and 2. edit their exif data
     to add information such as focal length, shutter speed, aperture, information
     on the camera and lens such as brand and model and metadata such as location,
     date and time.
-    The package also accepts data in JSON format as provided by the `analog`
-    and `Frames` apps or in csv as provided by the `Datafilm` app.
-    This allows a photographer to take notes on the `analog`, `Frames` or
-    `Datafilm` app while shooting pictures, export compatible metadata and use R
+    The package also accepts data in JSON format as provided by the 'analog'
+    and 'Frames' apps or in csv as provided by the 'Datafilm' app.
+    This allows a photographer to take notes on the 'analog', 'Frames' or
+    'Datafilm' app while shooting pictures, export compatible metadata and use R
     to rename scans and edit their exif metadata with corresponding shot
     information.
-URL: https://github.com/albansagouis/APMD/, https://nossaflex.io/
+URL: https://github.com/albansagouis/APMD/
 License: GPL (>= 3)
 BugReports: https://github.com/albansagouis/APMD/issues
 Depends: R (>= 4.1.0)
@@ -32,8 +32,11 @@ Imports:
     jsonlite,
     checkmate
 Suggests:
+    knitr,
+    quarto,
     withr,
     testthat (>= 3.0.0)
+VignetteBuilder: quarto
 Config/testthat/edition: 3
 Config/testthat/parallel: false
 Config/testthat/start-first: *reading*, *parsing*, *insert*, *renaming*

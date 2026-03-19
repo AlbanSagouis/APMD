@@ -4,18 +4,23 @@
 \alias{insert_missing_records}
 \title{Insert rows in metadata data.tables}
 \usage{
-insert_missing_records(metadata, i, value, extrapolate_data = FALSE)
+insert_missing_records(
+  metadata,
+  row_indices,
+  new_rows,
+  extrapolate_data = FALSE
+)
 }
 \arguments{
 \item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
 \code{\link{parsing_custom}} or \code{\link{parsing_json}}.}
 
-\item{i}{An integer or integer vectors of row numbers where new values should
-be inserted.}
+\item{row_indices}{An integer or integer vector of row numbers where new
+rows should be inserted (before the row at that position).}
 
-\item{value}{A data.frame or data.table with column names matching names in
-`metadata` and values to insert, probably Roll_Name and Camera_Brand for
-instance.}
+\item{new_rows}{A data.frame or data.table with column names matching names
+in `metadata` and values to insert, e.g. Roll_Name and Camera_Brand.
+Must have the same number of rows as `row_indices`.}
 
 \item{extrapolate_data}{Logical, FALSE by default. If TRUE, the function
 computes average Date_Time_Original, Latitude and Longitude values. Hence
@@ -29,17 +34,22 @@ Insert rows in metadata data.tables
 # NOSSAFLEX data
 metadata <- reading_nossaflex("tests/testthat/testdata/nossaflex_filenames.txt") |>
     parsing_nossaflex()
-value <- data.table::data.table(T = "est roll", NO = "02", SS = "125",
-                                A = "1.4", FL = "50", EX = "0")
-insert_missing_records(metadata, 2, value)
+new_rows <- data.frame(Roll_Name = "est roll", NO = "02", SS = "125",
+                       A = "1.4", FL = "50", EX = "0")
+insert_missing_records(metadata, row_indices = 2L, new_rows = new_rows)
+
 # JSON data
 metadata <- parsing_json("tests/testthat/testdata/nossaflex_Vito_70_test-week.txt")
-value <- data.table::data.table(Roll_Name = rep("Test-week", 3),
-                                Roll_Number = rep("005", 3),
-                                Camera_Brand = rep("Voigtlaender", 3),
-                                Camera_Model = rep("Vito 70", 3), NO = 5:7,
-                                SS = rep("auto", 3), A = rep("auto", 3))
-insert_missing_records(metadata = metadata, i = 5:7, value = value,
+new_rows <- data.frame(
+  Roll_Name    = rep("Test-week", 3),
+  Roll_Number  = rep("005", 3),
+  Camera_Brand = rep("Voigtlaender", 3),
+  Camera_Model = rep("Vito 70", 3),
+  NO = 5:7,
+  SS = rep("auto", 3),
+  A  = rep("auto", 3)
+)
+insert_missing_records(metadata, row_indices = 5:7, new_rows = new_rows,
                        extrapolate_data = TRUE)
 }
 }

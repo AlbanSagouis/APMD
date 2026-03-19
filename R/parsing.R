@@ -44,7 +44,9 @@ parsing_nossaflex <- function(filenames) {
 #' Inspired by \code{\link[base]{strptime}}
 #' @keywords internal
 
-parsing_custom <- function(filenames, format = "NO%NO_SS%SS_A%A_FL%FL_EX%EX") {}
+parsing_custom <- function(filenames, format = "NO%NO_SS%SS_A%A_FL%FL_EX%EX") {
+  stop("Not yet implemented", call. = FALSE)
+}
 
 #' Parsing the JSON data sent by the `Analog` app
 #' @param path Complete path to the JSON data saved in a text file.
@@ -100,7 +102,7 @@ parsing_json <- function(path, apply_corrections = TRUE) {
     )
   )
   if (is.element("NO", colnames(res))) {
-    data.table::setorder(x = res, NO)
+    data.table::setorder(x = res, "NO")
   }
 
   # Coordinates
@@ -125,7 +127,7 @@ parsing_json <- function(path, apply_corrections = TRUE) {
       json$Camera$`Camera Brand` == "Voigtlaender" &&
         json$Camera$`Camera Model` == "Vito 70"
     ) {
-      res[j = Lens_Focal_Length := 70L]
+      data.table::set(res, j = "Lens_Focal_Length", value = 70L)
       res[j = c("SS", "A") := "auto"]
     }
   }
@@ -159,10 +161,13 @@ parsing_frames <- function(path) {
     NO = json$frames$number,
     SS = json$frames$shutterSpeed,
     A = json$frames$aperture,
-    # FL = sapply(json$frames, function(shot) shot$`Focal Length`),
+    # FL (shot focal length) not available in Frames format
     Lens_Brand = json$frames$lens.make,
+    Lens_Model = json$frames$lens.model,
     Lens_Maximum_Aperture = json$frames$lens.maxAperture,
-    Lens_Focal_Length = json$frames$lens.maxFocalLength,
+    # Note: Frames exports the lens maximum focal length, not the shot focal
+    # length. For prime lenses these are the same; for zooms they differ.
+    Lens_Max_Focal_Length = json$frames$lens.maxFocalLength,
     EX = json$frames$exposure,
     Date_Time_Original = json$frames$createdAt,
     Latitude = json$frames$latitude,
@@ -171,7 +176,7 @@ parsing_frames <- function(path) {
     Easting = "E"
   )
   if (is.element("NO", colnames(res))) {
-    data.table::setorder(x = res, NO)
+    data.table::setorder(x = res, "NO")
   }
 
   return(res)

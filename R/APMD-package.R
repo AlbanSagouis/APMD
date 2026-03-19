@@ -7,17 +7,4 @@
 "_PACKAGE"
 .datatable.aware <- TRUE
 
-## usethis namespace: start
-utils::globalVariables(c(
-  ".",
-  ".N",
-  ".SD",
-  "..variables",
-  "Date_Time_Original",
-  "ExposureTime",
-  "Lens_Focal_Length",
-  "NO",
-  "SS"
-))
-## usethis namespace: end
 NULL
