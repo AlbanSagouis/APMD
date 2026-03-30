@@ -181,3 +181,87 @@ parsing_frames <- function(path) {
 
   return(res)
 }
+
+
+#' Parsing CSV data from the Analog+ app
+#' @param path Complete path to the CSV file saved by the Analog+ app.
+#' @inherit parsing_nossaflex return
+#' @details
+#' Reads the CSV format exported by the Analog+ iOS app. The following column
+#' mappings are applied:
+#'
+#' | CSV column      | Output column        | Transformation                       |
+#' |-----------------|----------------------|--------------------------------------|
+#' | `Frame`         | `NO`                 | none                                 |
+#' | `Shutter Speed` | `SS`                 | none (e.g. `"1/125"`)                |
+#' | `Aperture`      | `A`                  | `"f/"` prefix stripped               |
+#' | `Focal`         | `FL`                 | `"mm"` suffix stripped               |
+#' | `Compensation`  | `EX`                 | `" EV"` suffix stripped              |
+#' | `ISO`           | `ISO`                | none                                 |
+#' | `Flash`         | `Flash`              | none                                 |
+#' | `Date`          | `Date_Time_Original` | `DD/MM/YYYY, H:MM` → `YYYY:MM:DD HH:MM:SS` |
+#' | `Latitude`      | `Latitude`           | none                                 |
+#' | `Longitude`     | `Longitude`          | none                                 |
+#' | ` Camera`       | `Camera_Brand`       | first word; leading space in header trimmed |
+#' |                 | `Camera_Model`       | remainder                            |
+#' | `Lens`          | `Lens_Brand`         | first word                           |
+#' |                 | `Lens_Model`         | remainder; `NA` for single-word lens |
+#' | `Stock`         | `Stock`              | none                                 |
+#'
+#' `Northing` and `Easting` are set to `"N"` and `"E"` respectively.
+#' Dates are parsed assuming UTC. The Analog+ app exports dates without
+#' timezone information.
+#' @importFrom data.table fread
+#' @export
+#' @examples
+#' \dontrun{
+#' path <- "~/Pictures/D39 Chemnitz/Chemnitz 2025.csv"
+#' parsing_csv(path = path)
+#' }
+
+parsing_csv <- function(path) {
+  checkmate::assert_access(path, access = "r")
+
+  csv <- data.table::fread(file = path, encoding = "UTF-8")
+  data.table::setnames(x = csv, old = names(csv), new = trimws(names(csv)))
+
+  camera_parts <- stringi::stri_split_fixed(str = csv[["Camera"]], pattern = " ", n = 2L)
+  lens_parts   <- stringi::stri_split_fixed(str = csv[["Lens"]],   pattern = " ", n = 2L)
+
+  res <- data.table::data.table(
+    NO    = csv[["Frame"]],
+    SS    = csv[["Shutter Speed"]],
+    A     = stringi::stri_replace_first_fixed(str = csv[["Aperture"]],     pattern = "f/",  replacement = ""),
+    FL    = stringi::stri_replace_first_fixed(str = csv[["Focal"]],        pattern = "mm",  replacement = ""),
+    EX    = stringi::stri_replace_first_fixed(str = csv[["Compensation"]], pattern = " EV", replacement = ""),
+    ISO   = csv[["ISO"]],
+    Flash = csv[["Flash"]],
+    Date_Time_Original = format(
+      x      = as.POSIXct(x = csv[["Date"]], format = "%d/%m/%Y, %H:%M", tz = "UTC"),
+      format = "%Y:%m:%d %H:%M:%S"
+    ),
+    Latitude  = csv[["Latitude"]],
+    Longitude = csv[["Longitude"]],
+    Northing  = "N",
+    Easting   = "E",
+    Camera_Brand = vapply(X = camera_parts, FUN = `[[`, FUN.VALUE = character(1L), 1L),
+    Camera_Model = vapply(
+      X         = camera_parts,
+      FUN       = function(x) if (length(x) >= 2L) x[[2L]] else NA_character_,
+      FUN.VALUE = character(1L)
+    ),
+    Lens_Brand = vapply(X = lens_parts, FUN = `[[`, FUN.VALUE = character(1L), 1L),
+    Lens_Model = vapply(
+      X         = lens_parts,
+      FUN       = function(x) if (length(x) >= 2L) x[[2L]] else NA_character_,
+      FUN.VALUE = character(1L)
+    ),
+    Stock = csv[["Stock"]]
+  )
+
+  if (is.element("NO", colnames(res))) {
+    data.table::setorder(x = res, "NO")
+  }
+
+  return(res[])
+}
