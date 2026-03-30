@@ -7,7 +7,7 @@
 \alias{add_lens_data_nikon_AF_85}
 \alias{add_lens_data_nikon_AF_105_D}
 \alias{add_lens_data_sigma_AF_28_70_D}
-\title{Nikon AF 28-105 D}
+\title{Lens data helpers for common Nikon and Sigma lenses}
 \usage{
 add_lens_data_nikon_AF_28_105_D()
 
@@ -21,22 +21,21 @@ add_lens_data_nikon_AF_105_D()
 
 add_lens_data_sigma_AF_28_70_D()
 }
+\value{
+A one-row data.frame with Nikon lens EXIF fields:
+  `Nikon:LensIDNumber`, `Nikon:LensFStops`, `Nikon:MinFocalLength`,
+  `Nikon:MaxFocalLength`, `Nikon:MaxApertureAtMinFocal`,
+  `Nikon:MaxApertureAtMaxFocal`, `Nikon:MCUVersion`, `Nikon:LensType`,
+  `Nikon:LensSpec`, `Nikon:LensID`.
+}
 \description{
-Nikon AF 28-105 D
-
-Nikon AF 24 D
-
-Nikon AF 50 D
-
-Nikon AF 85
-
-Nikon AF 105 D
-
-Sigma AF 28-70 f2.8
+Each function returns a one-row data.frame of Nikon EXIF lens fields that
+can be passed directly to [editing_exif()] via the `metadata` argument or
+merged with an existing metadata table.
 }
 \details{
-To help `exiftoolr` to guess the lend ID, we can provide a lens of favourite
-   lenses in a config file:
+To help `exiftoolr` to guess the lens ID, you can provide a list of
+   favourite lenses in a config file:
    # ~/.ExifTool_config
    # A special 'Lenses' list can be defined to give priority to specific lenses
    # in the logic to determine a lens model for the Composite:LensID tag
@@ -50,11 +49,15 @@ To help `exiftoolr` to guess the lend ID, we can provide a lens of favourite
   Additional lenses can be added here, the information listed here can be
   found in the exif data of pictures taken with the additional lenses.
 
-  `Nikon:LensType` = 2 for D lenses and 0 for non-D lenses
+  `Nikon:LensType` = 2 for D lenses and 0 for non-D lenses.
   Exact values for the fields such as `Nikon:MinFocalLength` were obtained
   by shooting the lens with a DSLR and looking at the EXIF data.
 }
+\examples{
+add_lens_data_nikon_AF_28_105_D()
+add_lens_data_nikon_AF_50_D()
+}
 \seealso{
 See <https://exiftool.org/TagNames/Nikon.html#LensID> for the list
-   of standard lens names
+   of standard lens names.
 }

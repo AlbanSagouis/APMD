@@ -6,9 +6,9 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml)
-[![Project Status: WIP – Initial development is in progress, but there
-has not yet been a stable, usable release suitable for the
-public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable
+state and is being actively
+developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![Code Coverage:
 98%](https://img.shields.io/badge/code_coverage-98%25-brightgreen)
 <!-- badges: end -->
@@ -61,8 +61,13 @@ Here are the main functions in the package:
 
 ### Installation
 
-You can install the development version of APMD from
-[GitHub](https://github.com/) with:
+You can install the released version of APMD from CRAN with:
+
+``` r
+install.packages("APMD")
+```
+
+Or the development version from GitHub with:
 
 ``` r
 remotes::install_github(

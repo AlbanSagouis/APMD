@@ -10,8 +10,12 @@ reading_nossaflex(path)
 \item{path}{if null, reading from clipboard}
 }
 \value{
-a vector of file names without extension
+a character vector of file names without extension
 }
 \description{
 Reading nossaflex file names
+}
+\examples{
+path <- system.file("extdata", "nossaflex_example.txt", package = "APMD")
+reading_nossaflex(path = path)
 }

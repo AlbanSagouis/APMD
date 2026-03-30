@@ -19,10 +19,12 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' files <- tools::list_files_with_exts(dir = "tests/testthat/testdata/",
-#'                     exts = "jpg", full.names = TRUE)
+#' files <- tools::list_files_with_exts(
+#'   dir = system.file("extdata", package = "APMD"),
+#'   exts = "jpg", full.names = TRUE
+#' )
 #' filenames <- c("NO01_SS1s_A5.6_FL35_EX-2", "NO02_SS125_A5.6_FL35_EX+1")
-#' renaming_nossaflex(files, filenames, copy = TRUE)
+#' renaming_nossaflex(files = files, filenames = filenames, copy = TRUE)
 #' }
 
 renaming_nossaflex <- function(files, filenames, copy = FALSE) {

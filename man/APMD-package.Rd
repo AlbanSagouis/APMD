@@ -4,7 +4,7 @@
 \name{APMD-package}
 \alias{APMD}
 \alias{APMD-package}
-\title{APMD: Analog Photography MetaData - Edit Exif Data of Pictures}
+\title{APMD: Analog Photography Metadata and 'EXIF' Editing via 'NOSSAFLEX'}
 \description{
 The APMD package is developed in GitHub
 (https://github.com/albansagouis/APMD). To see the preferable citation of
@@ -16,6 +16,10 @@ Useful links:
   \item \url{https://github.com/albansagouis/APMD/}
   \item Report bugs at \url{https://github.com/albansagouis/APMD/issues}
 }
+
+}
+\author{
+\strong{Maintainer}: Alban Sagouis \email{sagouis@pm.me} (\href{https://orcid.org/0000-0002-3827-1063}{ORCID}) [copyright holder]
 
 }
 \keyword{internal}

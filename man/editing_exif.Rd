@@ -18,7 +18,7 @@ editing_exif(
 \code{\link[tools:fileutils]{tools::list_files_with_exts}} gives}
 
 \item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
-\code{\link{parsing_custom}} or \code{\link{parsing_json}}.}
+\code{\link{parsing_json}} or \code{\link{parsing_frames}}.}
 
 \item{extra_tags}{A named character vector of additional exif tags to write
 for every file, e.g. `c(Artist = "Jane Smith", Copyright = "2024 Jane Smith")`.
@@ -28,6 +28,10 @@ These are appended to the per-shot metadata tags.}
 
 \item{verbose}{passes `-v2` argument to `exiftool`}
 }
+\value{
+Called for its side effect of writing EXIF tags to `files`.
+  Returns `NULL` invisibly.
+}
 \description{
 Batch editing of exif data
 }
@@ -36,11 +40,15 @@ Editing the `maker`, `model` and various `makerNotes` tags before or during dark
 }
 \examples{
 \dontrun{
-files <- tools::list_files_with_exts(dir = "tests/testthat/testdata/",
-                    exts = "jpg", full.names = TRUE)
-metadata <- reading_nossaflex("tests/testthat/testdata/nossaflex_filenames.txt") |>
-    parsing_nossaflex()
-editing_exif(files, metadata)
+files <- tools::list_files_with_exts(
+  dir = system.file("extdata", package = "APMD"),
+  exts = "jpg", full.names = TRUE
+)
+metadata <- reading_nossaflex(
+  path = system.file("extdata", "nossaflex_filenames.txt", package = "APMD")
+) |>
+  parsing_nossaflex()
+editing_exif(files = files, metadata = metadata)
 
 metadata <- data.frame(
   NO = c(1, 2), SS = c("2s", "4000"), A = c(1.4, 2.8),
@@ -53,7 +61,7 @@ metadata <- data.frame(
   Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
   Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
 )
-editing_exif(files, metadata, extra_tags = c(Artist = "Jane Smith"))
+editing_exif(files = files, metadata = metadata, extra_tags = c(Artist = "Jane Smith"))
 }
 
 

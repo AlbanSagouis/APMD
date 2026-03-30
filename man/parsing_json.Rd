@@ -26,7 +26,7 @@ Parsing the JSON data sent by the `Analog` app
 }
 \examples{
 \dontrun{
-path = "tests/testthat/testdata/test1.json"
-parsing_json(path)
+path <- "/path/to/exported_analog_data.json"
+parsing_json(path = path)
 }
 }

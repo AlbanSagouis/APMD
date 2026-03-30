@@ -42,7 +42,7 @@ parsing_nossaflex <- function(filenames) {
 #'    `NO01_SS125_A5.6_FL35_EX+1`.
 #' @details
 #' Inspired by \code{\link[base]{strptime}}
-#' @keywords internal
+#' @noRd
 
 parsing_custom <- function(filenames, format = "NO%NO_SS%SS_A%A_FL%FL_EX%EX") {
   stop("Not yet implemented", call. = FALSE)
@@ -63,8 +63,8 @@ parsing_custom <- function(filenames, format = "NO%NO_SS%SS_A%A_FL%FL_EX%EX") {
 #' @export
 #' @examples
 #' \dontrun{
-#' path = "tests/testthat/testdata/test1.json"
-#' parsing_json(path)
+#' path <- "/path/to/exported_analog_data.json"
+#' parsing_json(path = path)
 #' }
 
 parsing_json <- function(path, apply_corrections = TRUE) {
@@ -143,8 +143,8 @@ parsing_json <- function(path, apply_corrections = TRUE) {
 #' @export
 #' @examples
 #' \dontrun{
-#' path = 'tests/testthat/testdata/Berlin_Boat.frames'
-#' parsing_frames(path)
+#' path <- "/path/to/exported_frames_data.frames"
+#' parsing_frames(path = path)
 #' }
 
 parsing_frames <- function(path) {

@@ -17,7 +17,7 @@ Parsing the JSON data sent by the `Frames` app
 }
 \examples{
 \dontrun{
-path = 'tests/testthat/testdata/Berlin_Boat.frames'
-parsing_frames(path)
+path <- "/path/to/exported_frames_data.frames"
+parsing_frames(path = path)
 }
 }

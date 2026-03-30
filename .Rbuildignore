@@ -2,6 +2,7 @@
 ^\.Rproj\.user$
 ^tests$
 ^LICENSE\.md$
+^cran-comments.md$
 ^codemeta\.json$
 .github
 ^\.github$

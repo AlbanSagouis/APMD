@@ -1,7 +1,11 @@
-#' Nikon AF 28-105 D
+#' Lens data helpers for common Nikon and Sigma lenses
+#'
+#' Each function returns a one-row data.frame of Nikon EXIF lens fields that
+#' can be passed directly to [editing_exif()] via the `metadata` argument or
+#' merged with an existing metadata table.
 #' @details
-#'    To help `exiftoolr` to guess the lend ID, we can provide a lens of favourite
-#'    lenses in a config file:
+#'    To help `exiftoolr` to guess the lens ID, you can provide a list of
+#'    favourite lenses in a config file:
 #'    # ~/.ExifTool_config
 #'    # A special 'Lenses' list can be defined to give priority to specific lenses
 #'    # in the logic to determine a lens model for the Composite:LensID tag
@@ -15,12 +19,20 @@
 #'   Additional lenses can be added here, the information listed here can be
 #'   found in the exif data of pictures taken with the additional lenses.
 #'
-#'   `Nikon:LensType` = 2 for D lenses and 0 for non-D lenses
+#'   `Nikon:LensType` = 2 for D lenses and 0 for non-D lenses.
 #'   Exact values for the fields such as `Nikon:MinFocalLength` were obtained
 #'   by shooting the lens with a DSLR and looking at the EXIF data.
+#' @returns A one-row data.frame with Nikon lens EXIF fields:
+#'   `Nikon:LensIDNumber`, `Nikon:LensFStops`, `Nikon:MinFocalLength`,
+#'   `Nikon:MaxFocalLength`, `Nikon:MaxApertureAtMinFocal`,
+#'   `Nikon:MaxApertureAtMaxFocal`, `Nikon:MCUVersion`, `Nikon:LensType`,
+#'   `Nikon:LensSpec`, `Nikon:LensID`.
 #' @seealso See <https://exiftool.org/TagNames/Nikon.html#LensID> for the list
-#'    of standard lens names
+#'    of standard lens names.
 #' @rdname adding_lens_info
+#' @examples
+#' add_lens_data_nikon_AF_28_105_D()
+#' add_lens_data_nikon_AF_50_D()
 #' @export
 add_lens_data_nikon_AF_28_105_D <- function() {
   data.frame(

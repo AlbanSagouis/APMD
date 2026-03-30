@@ -1,26 +1,23 @@
 Package: APMD
 Type: Package
-Title: Analog Photography MetaData - Edit Exif Data of Pictures
+Title: Analog Photography Metadata and 'EXIF' Editing via 'NOSSAFLEX'
 Version: 0.1.9004
-Author: c(
+Authors@R: c(
   person("Alban", "Sagouis", role = c("aut", "cre", "cph"),
         email = "sagouis@pm.me",
         comment = c(ORCID = "0000-0002-3827-1063")))
 Maintainer: Alban Sagouis <sagouis@pm.me>
-Description: Photographs taken on film, then developed and then
-    scanned are lacking important metadata or if they have, it's from the
-    scanning device, not the original camera.
-    The APMD package takes NOSSAFLEX structured file names
-    and can 1. batch rename corresponding pictures and 2. edit their exif data
-    to add information such as focal length, shutter speed, aperture, information
-    on the camera and lens such as brand and model and metadata such as location,
-    date and time.
-    The package also accepts data in JSON format as provided by the 'analog'
-    and 'Frames' apps or in csv as provided by the 'Datafilm' app.
-    This allows a photographer to take notes on the 'analog', 'Frames' or
-    'Datafilm' app while shooting pictures, export compatible metadata and use R
-    to rename scans and edit their exif metadata with corresponding shot
-    information.
+Description: Photographs taken on film, developed, and scanned lack
+    meaningful metadata, or carry only information from the scanning device
+    rather than the original camera.
+    Provides tools to parse file names following the NOSSAFLEX convention
+    (Number, Shutter Speed, Aperture, Focal Length, EXposure) and to
+    batch-rename scan files and write shot information into their
+    Exchangeable Image File Format (EXIF) slots using 'exiftoolr'.
+    Also accepts shot data in JavaScript Object Notation (JSON) format as
+    exported by the 'analog' and 'Frames' apps, or in CSV format as exported
+    by the 'Datafilm' app, allowing photographers to record metadata in the
+    field and process it in 'R'.
 URL: https://github.com/albansagouis/APMD/
 License: GPL (>= 3)
 BugReports: https://github.com/albansagouis/APMD/issues
@@ -43,3 +40,6 @@ Config/testthat/start-first: *reading*, *parsing*, *insert*, *renaming*
 Language: en-GB
 Encoding: UTF-8
 RoxygenNote: 7.3.3
+X-schema.org-applicationCategory: Multimedia
+X-schema.org-keywords: analog photography, film photography, EXIF, metadata,
+   NOSSAFLEX, photo renaming, film camera

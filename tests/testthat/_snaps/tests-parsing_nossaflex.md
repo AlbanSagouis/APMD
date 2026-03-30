@@ -1,7 +1,7 @@
 # parsing works as expected
 
     Code
-      parsing_nossaflex(reading_nossaflex(path = testthat::test_path("testdata",
+      parsing_nossaflex(reading_nossaflex(path = testthat::test_path("fixtures",
         "nossaflex_filenames.txt")))
     Output
                 T     NO     SS      A     FL     EX

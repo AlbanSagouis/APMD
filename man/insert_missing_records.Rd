@@ -13,7 +13,7 @@ insert_missing_records(
 }
 \arguments{
 \item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
-\code{\link{parsing_custom}} or \code{\link{parsing_json}}.}
+\code{\link{parsing_json}} or \code{\link{parsing_frames}}.}
 
 \item{row_indices}{An integer or integer vector of row numbers where new
 rows should be inserted (before the row at that position).}
@@ -30,26 +30,10 @@ works only with JSON data.}
 Insert rows in metadata data.tables
 }
 \examples{
-\dontrun{
-# NOSSAFLEX data
-metadata <- reading_nossaflex("tests/testthat/testdata/nossaflex_filenames.txt") |>
-    parsing_nossaflex()
-new_rows <- data.frame(Roll_Name = "est roll", NO = "02", SS = "125",
-                       A = "1.4", FL = "50", EX = "0")
-insert_missing_records(metadata, row_indices = 2L, new_rows = new_rows)
-
-# JSON data
-metadata <- parsing_json("tests/testthat/testdata/nossaflex_Vito_70_test-week.txt")
-new_rows <- data.frame(
-  Roll_Name    = rep("Test-week", 3),
-  Roll_Number  = rep("005", 3),
-  Camera_Brand = rep("Voigtlaender", 3),
-  Camera_Model = rep("Vito 70", 3),
-  NO = 5:7,
-  SS = rep("auto", 3),
-  A  = rep("auto", 3)
-)
-insert_missing_records(metadata, row_indices = 5:7, new_rows = new_rows,
-                       extrapolate_data = TRUE)
-}
+metadata <- reading_nossaflex(
+  path = system.file("extdata", "nossaflex_example.txt", package = "APMD")
+) |>
+  parsing_nossaflex()
+new_rows <- data.frame(NO = "02", SS = "125", A = "1.4", FL = "50", EX = "0")
+insert_missing_records(metadata = metadata, row_indices = 2L, new_rows = new_rows)
 }

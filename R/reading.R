@@ -1,6 +1,9 @@
 #' Reading nossaflex file names
 #' @param path if null, reading from clipboard
-#' @returns a vector of file names without extension
+#' @returns a character vector of file names without extension
+#' @examples
+#' path <- system.file("extdata", "nossaflex_example.txt", package = "APMD")
+#' reading_nossaflex(path = path)
 #' @export
 
 reading_nossaflex <- function(path) {

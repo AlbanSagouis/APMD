@@ -3,7 +3,7 @@ testthat::test_that("insert_missing_records works as expected with NOSSAFLEX", {
   testthat::skip_on_ci()
   testthat::skip_on_cran()
 
-  metadata <- reading_nossaflex(path = testthat::test_path("testdata", "nossaflex_filenames.txt")) |>
+  metadata <- reading_nossaflex(path = testthat::test_path("fixtures", "nossaflex_filenames.txt")) |>
     parsing_nossaflex()
   new_rows <- data.frame(T = "est roll", NO = "02", SS = "125",
                          A = "1.4", FL = "50", EX = "0")
@@ -17,7 +17,7 @@ testthat::test_that("insert_missing_records works as expected with JSON", {
   testthat::skip_on_ci()
   testthat::skip_on_cran()
 
-  metadata <- parsing_json(path = testthat::test_path("testdata",
+  metadata <- parsing_json(path = testthat::test_path("fixtures",
                                                       "nossaflex_Vito_70_test-week.txt"))
   new_rows <- data.frame(
     Roll_Name    = rep("Test-week", 3),
@@ -38,7 +38,7 @@ testthat::test_that("insert_missing_records works as expected with JSON and extr
   testthat::skip_on_ci()
   testthat::skip_on_cran()
 
-  metadata <- parsing_json(path = testthat::test_path("testdata",
+  metadata <- parsing_json(path = testthat::test_path("fixtures",
                                                       "nossaflex_Vito_70_test-week.txt"))
   new_rows <- data.frame(
     Roll_Name    = rep("Test-week", 3),
