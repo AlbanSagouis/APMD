@@ -5,20 +5,20 @@
 \title{Batch editing of exif data}
 \usage{
 editing_exif(
-  files,
   metadata,
+  files,
   extra_tags = NULL,
   overwrite_original = FALSE,
   verbose = TRUE
 )
 }
 \arguments{
+\item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
+\code{\link{parsing_json}} or \code{\link{parsing_frames}}.}
+
 \item{files}{a character vector of paths with complete file names like what
 \code{\link{list.files}} when used with `full.names = TRUE` or
 \code{\link[tools:fileutils]{tools::list_files_with_exts}} gives}
-
-\item{metadata}{a data.frame as provided by \code{\link{parsing_nossaflex}},
-\code{\link{parsing_json}} or \code{\link{parsing_frames}}.}
 
 \item{extra_tags}{A named character vector of additional exif tags to write
 for every file, e.g. `c(Artist = "Jane Smith", Copyright = "2024 Jane Smith")`.
@@ -48,7 +48,7 @@ metadata <- reading_nossaflex(
   path = system.file("extdata", "nossaflex_filenames.txt", package = "APMD")
 ) |>
   parsing_nossaflex()
-editing_exif(files = files, metadata = metadata)
+editing_exif(metadata = metadata, files = files)
 
 metadata <- data.frame(
   NO = c(1, 2), SS = c("2s", "4000"), A = c(1.4, 2.8),
@@ -61,7 +61,7 @@ metadata <- data.frame(
   Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
   Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
 )
-editing_exif(files = files, metadata = metadata, extra_tags = c(Artist = "Jane Smith"))
+editing_exif(metadata = metadata, files = files, extra_tags = c(Artist = "Jane Smith"))
 }
 
 

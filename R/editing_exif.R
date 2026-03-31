@@ -24,7 +24,7 @@
 #'   path = system.file("extdata", "nossaflex_filenames.txt", package = "APMD")
 #' ) |>
 #'   parsing_nossaflex()
-#' editing_exif(files = files, metadata = metadata)
+#' editing_exif(metadata = metadata, files = files)
 #'
 #' metadata <- data.frame(
 #'   NO = c(1, 2), SS = c("2s", "4000"), A = c(1.4, 2.8),
@@ -37,7 +37,7 @@
 #'   Lens_Model = c("Nikkor AF 50mm d f/1.4", "Nikkor AF 50mm d f/1.4"),
 #'   Lens_Focal_Length = c(50, 50), Lens_Maximum_Aperture = c(1.4, 1.4)
 #' )
-#' editing_exif(files = files, metadata = metadata, extra_tags = c(Artist = "Jane Smith"))
+#' editing_exif(metadata = metadata, files = files, extra_tags = c(Artist = "Jane Smith"))
 #' }
 #'
 #'
@@ -50,8 +50,8 @@
 ##############
 # 2) taking advantage of exiftool batch execution abilities
 editing_exif <- function(
-  files,
   metadata,
+  files,
   extra_tags = NULL,
   overwrite_original = FALSE,
   verbose = TRUE
