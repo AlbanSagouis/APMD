@@ -7,7 +7,7 @@
   "codeRepository": "https://github.com/albansagouis/APMD/",
   "issueTracker": "https://github.com/albansagouis/APMD/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.9004",
+  "version": "0.1.9006",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -137,6 +137,18 @@
     },
     "5": {
       "@type": "SoftwareApplication",
+      "identifier": "dplyr",
+      "name": "dplyr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=dplyr"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
       "provider": {
@@ -147,7 +159,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "6": {
+    "7": {
       "@type": "SoftwareApplication",
       "identifier": "checkmate",
       "name": "checkmate",
@@ -163,7 +175,7 @@
   },
   "applicationCategory": "Multimedia",
   "keywords": ["analogphotography", "filmphotography", "EXIF", "metadata", "NOSSAFLEX", "photorenaming", "filmcamera", "data-management", "exif-metadata", "photography", "r", "analog-photography", "weekend-project"],
-  "fileSize": "242.598KB",
+  "fileSize": "249.545KB",
   "releaseNotes": "https://github.com/albansagouis/APMD/blob/master/NEWS.md",
   "readme": "https://github.com/AlbanSagouis/APMD/blob/main/README.md",
   "contIntegration": "https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml",

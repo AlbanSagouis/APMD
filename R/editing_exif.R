@@ -12,7 +12,7 @@
 #'
 #' @returns Called for its side effect of writing EXIF tags to `files`.
 #'   Returns `NULL` invisibly.
-#' @importFrom data.table :=
+#' @importFrom dplyr select any_of mutate across if_else case_when
 #' @export
 #' @examples
 #' \dontrun{
@@ -158,51 +158,55 @@ editing_exif <- function(
 
   checkmate::assert_true(length(exif_tags) == length(exif_names))
 
-  metadata[
-    j = colnames(metadata)[!is.element(colnames(metadata), exif_tags)] := NULL
-  ]
+  metadata <- as.data.frame(select(metadata, any_of(exif_tags)))
 
   # Converting values ----
   ## Excluding "auto" values ----
   variables <- c("SS", "FL", "A")
-  if (any(metadata[, variables, with = FALSE] == "auto")) {
+  if (any(select(metadata, any_of(variables)) == "auto")) {
     message('"auto" values in SS, A and FL are turned into "".')
-    for (col in variables) {
-      vals <- metadata[[col]]
-      auto_idx <- grep("auto", vals, fixed = TRUE)
-      if (length(auto_idx) > 0L) {
-        data.table::set(metadata, i = auto_idx, j = col, value = "")
-      }
-    }
+    metadata <- mutate(
+      metadata,
+      across(
+        any_of(variables),
+        ~ if_else(grepl("auto", .x, fixed = TRUE), "", .x)
+      )
+    )
   }
 
   ## ShutterSpeedValue and ExposureTime ----
   # Capture original SS before transformation — ExposureTime needs it
   original_SS <- metadata[["SS"]]
 
-  data.table::set(
-    x = metadata,
-    j = "SS",
-    value = data.table::fcase(
-      grepl("/", original_SS, fixed = TRUE), original_SS,
-      grepl("s", original_SS, fixed = TRUE), sub("s", "", original_SS, fixed = TRUE),
-      !is.na(as.numeric(original_SS)), as.character(1 / as.numeric(original_SS)),
-      default = ""
-    )
-  )
-
-  # ExposureTime: decimal seconds derived from the original SS string
-  data.table::set(
-    x = metadata,
-    j = "ExposureTime",
-    value = data.table::fcase(
-      grepl("/", x = original_SS, fixed = TRUE),
-      (1 / as.integer(sub("1/", "", original_SS, fixed = TRUE))) |> as.character(),
-      grepl("s", x = original_SS, fixed = TRUE),
-      sub("s", "", x = original_SS, fixed = TRUE),
-      !is.na(suppressWarnings(as.numeric(original_SS))),
-      as.character(1 / as.numeric(original_SS)),
-      default = ""
+  metadata <- mutate(
+    metadata,
+    SS = case_when(
+      grepl("/", original_SS, fixed = TRUE) ~ original_SS,
+      grepl("s", original_SS, fixed = TRUE) ~ sub(
+        "s",
+        "",
+        original_SS,
+        fixed = TRUE
+      ),
+      !is.na(suppressWarnings(as.numeric(original_SS))) ~ as.character(
+        1 / suppressWarnings(as.numeric(original_SS))
+      ),
+      .default = ""
+    ),
+    # ExposureTime: decimal seconds derived from the original SS string
+    ExposureTime = case_when(
+      grepl("/", original_SS, fixed = TRUE) ~
+        suppressWarnings(as.character(1 / as.integer(sub("1/", "", original_SS, fixed = TRUE)))),
+      grepl("s", original_SS, fixed = TRUE) ~ sub(
+        "s",
+        "",
+        original_SS,
+        fixed = TRUE
+      ),
+      !is.na(suppressWarnings(as.numeric(original_SS))) ~ as.character(
+        1 / suppressWarnings(as.numeric(original_SS))
+      ),
+      .default = ""
     )
   )
 
@@ -214,31 +218,41 @@ editing_exif <- function(
   for (i in seq_along(files)) {
     arguments <- metadata[i, ]
 
-    matched_idx <- match(x = names(arguments), table = exif_tags, nomatch = NA_integer_)
-    arguments <- arguments[, !is.na(matched_idx), with = FALSE]
+    matched_idx <- match(
+      x = names(arguments),
+      table = exif_tags,
+      nomatch = NA_integer_
+    )
+    arguments <- arguments[, !is.na(matched_idx), drop = FALSE]
     matched_idx <- matched_idx[!is.na(matched_idx)]
 
     arguments <- stats::setNames(object = arguments, exif_names[matched_idx])
 
     shot_args <- sapply(
       seq_along(arguments),
-      function(j)
+      function(j) {
         stringi::stri_join("-", names(arguments)[[j]], "=", arguments[[j]])
+      }
     )
 
     extra_args <- if (!is.null(extra_tags)) {
       sapply(
         seq_along(extra_tags),
-        function(j)
+        function(j) {
           stringi::stri_join("-", names(extra_tags)[[j]], "=", extra_tags[[j]])
+        }
       )
     }
 
     all_args <- c(shot_args, extra_args)
 
-    if (isTRUE(overwrite_original)) all_args <- c("-overwrite_original", all_args)
+    if (isTRUE(overwrite_original)) {
+      all_args <- c("-overwrite_original", all_args)
+    }
 
-    if (isTRUE(verbose)) all_args <- c("-v2", all_args)
+    if (isTRUE(verbose)) {
+      all_args <- c("-v2", all_args)
+    }
 
     print(all_args)
 
