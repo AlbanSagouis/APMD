@@ -88,3 +88,15 @@ test_that("add_lens_data_sigma_AF_28_70_D returns correct LensID", {
     "Sigma 28-70mm F2.8"
   )
 })
+
+test_that("delete_lens_data returns one-row data.frame with expected columns", {
+  result <- delete_lens_data()
+  expect_s3_class(result, "data.frame")
+  expect_equal(nrow(result), 1L)
+  expect_named(result, lens_cols)
+})
+
+test_that("delete_lens_data returns empty strings for all fields", {
+  result <- delete_lens_data()
+  expect_true(all(vapply(result, function(x) x == "", logical(1L))))
+})

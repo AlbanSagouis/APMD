@@ -7,6 +7,7 @@
 \alias{add_lens_data_nikon_AF_85}
 \alias{add_lens_data_nikon_AF_105_D}
 \alias{add_lens_data_sigma_AF_28_70_D}
+\alias{delete_lens_data}
 \title{Lens data helpers for common Nikon and Sigma lenses}
 \usage{
 add_lens_data_nikon_AF_28_105_D()
@@ -20,6 +21,8 @@ add_lens_data_nikon_AF_85()
 add_lens_data_nikon_AF_105_D()
 
 add_lens_data_sigma_AF_28_70_D()
+
+delete_lens_data()
 }
 \value{
 A one-row data.frame with Nikon lens EXIF fields:

@@ -132,16 +132,36 @@ add_lens_data_nikon_AF_105_D <- function() {
 #' @export
 add_lens_data_sigma_AF_28_70_D <- function() {
   data.frame(
-    `Nikon:LensIDNumber` = 50, # check
-    `Nikon:LensFStops` = 7, # check
-    `Nikon:MinFocalLength` = 28.28, # check
-    `Nikon:MaxFocalLength` = 70, # check
-    `Nikon:MaxApertureAtMinFocal` = 2.828, # check
-    `Nikon:MaxApertureAtMaxFocal` = 2.828, # check
-    `Nikon:MCUVersion` = 53, # check
-    `Nikon:LensType` = 2,
-    `Nikon:LensSpec` = "28 70 2.8 2.8 2",
+    `Nikon:LensIDNumber` = 2, # checked
+    `Nikon:LensFStops` = 5.833, # checked
+    `Nikon:MinFocalLength` = 28.28, # checked
+    `Nikon:MaxFocalLength` = 71.27, # checked
+    `Nikon:MaxApertureAtMinFocal` = 2.828, # checked
+    `Nikon:MaxApertureAtMaxFocal` = 2.828, # checked
+    `Nikon:MCUVersion` = 2, # checked
+    `Nikon:LensType` = 0, # checked
+    `Nikon:LensSpec` = "28 70 2.8 2.8 0",
+    # `Nikon:LensID` = "02 46 3C 5C 25 25 02 00",
     `Nikon:LensID` = "Sigma 28-70mm F2.8",
+    check.names = FALSE
+  )
+}
+
+#' Remove all lens info
+#' @rdname adding_lens_info
+#' @export
+delete_lens_data <- function() {
+  data.frame(
+    `Nikon:LensIDNumber` = "",
+    `Nikon:LensFStops` = "",
+    `Nikon:MinFocalLength` = "",
+    `Nikon:MaxFocalLength` = "",
+    `Nikon:MaxApertureAtMinFocal` = "",
+    `Nikon:MaxApertureAtMaxFocal` = "",
+    `Nikon:MCUVersion` = "",
+    `Nikon:LensType` = "",
+    `Nikon:LensSpec` = "",
+    `Nikon:LensID` = "",
     check.names = FALSE
   )
 }
