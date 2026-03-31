@@ -79,7 +79,6 @@ editing_exif <- function(
     "Latitude",
     "Longitude",
     "Date_Time_Original",
-    "Focus_Mode",
     #Camera
     "Camera_Brand",
     "Camera_Model",
@@ -90,15 +89,16 @@ editing_exif <- function(
     "Lens_Focal_Length",
     "Lens_Max_Focal_Length",
     "Lens_Maximum_Aperture",
-    # Nikon lens
-    "Nikon:LensIDNumber",
-    "Nikon:LensFStops",
-    "Nikon:MinFocalLength",
-    "Nikon:MaxFocalLength",
-    "Nikon:MaxApertureAtMinFocal",
-    "Nikon:MaxApertureAtMaxFocal",
-    "Nikon:MCUVersion",
-    "Nikon:LensType",
+    "Lens_Serial_Number",
+    # Nikon lens (encrypted MakerNote — not writable by exiftool)
+    #"Nikon:LensIDNumber",
+    #"Nikon:LensFStops",
+    #"Nikon:MinFocalLength",
+    #"Nikon:MaxFocalLength",
+    #"Nikon:MaxApertureAtMinFocal",
+    #"Nikon:MaxApertureAtMaxFocal",
+    #"Nikon:MCUVersion",
+    #"Nikon:LensType",
     #"Nikon:LensSpec", # composite
     #"Nikon:LensID", # composite
     # "Lens_ID", # composite
@@ -126,7 +126,6 @@ editing_exif <- function(
     "GPSLatitude",
     "GPSLongitude",
     "DateTimeOriginal",
-    "FocusMode",
     # Camera
     "Make",
     "Model",
@@ -134,23 +133,24 @@ editing_exif <- function(
     "XMP:Lens",
     "LensMake",
     "LensModel",
-    "MaxFocalLength",
+    "MinFocalLength",
     "MaxFocalLength",
     "MaxApertureValue",
-    # Nikon lens
-    "Nikon:LensIDNumber",
-    "Nikon:LensFStops",
-    "Nikon:MinFocalLength",
-    "Nikon:MaxFocalLength",
-    "Nikon:MaxApertureAtMinFocal",
-    "Nikon:MaxApertureAtMaxFocal",
-    "Nikon:MCUVersion",
-    "Nikon:LensType",
+    "LensSerialNumber",
+    # Nikon lens (encrypted MakerNote — not writable by exiftool)
+    #"Nikon:LensIDNumber",
+    #"Nikon:LensFStops",
+    #"Nikon:MinFocalLength",
+    #"Nikon:MaxFocalLength",
+    #"Nikon:MaxApertureAtMinFocal",
+    #"Nikon:MaxApertureAtMaxFocal",
+    #"Nikon:MCUVersion",
+    #"Nikon:LensType",
     #"Nikon:LensSpec", # composite
     #"Nikon:LensID", # composite
     # "LensID", # composite
     # Film stock
-    "ProfileName",
+    "ImageDescription",
     "ISO",
     # Flash
     "Flash"
@@ -210,6 +210,19 @@ editing_exif <- function(
     )
   )
 
+  ## ShutterSpeedValue APEX ----
+  # APEX = log2(1 / ExposureTime); derived from ExposureTime (already in decimal seconds)
+  if ("SS" %in% names(metadata)) {
+    metadata <- mutate(
+      metadata,
+      SS = if_else(
+        !is.na(ExposureTime) & ExposureTime != "",
+        as.character(log2(1 / as.numeric(ExposureTime))),
+        ""
+      )
+    )
+  }
+
   # if aperture is auto and SS no, mode is S
   # if aperture and SS is auto, mode is P
   # if aperture is given and SS is auto, mode is A
@@ -244,7 +257,21 @@ editing_exif <- function(
       )
     }
 
-    all_args <- c(shot_args, extra_args)
+    # LensInfo — canonical 4-element rational [MinFL MaxFL MinFN MaxFN] ----
+    lens_info_arg <- NULL
+    if (all(c("Lens_Focal_Length", "Lens_Max_Focal_Length", "Lens_Maximum_Aperture") %in% names(metadata))) {
+      min_fl <- metadata[[i, "Lens_Focal_Length"]]
+      max_fl <- metadata[[i, "Lens_Max_Focal_Length"]]
+      max_ap <- metadata[[i, "Lens_Maximum_Aperture"]]
+      if (!is.na(min_fl) && !is.na(max_fl) && !is.na(max_ap) &&
+          min_fl != "" && max_fl != "" && max_ap != "") {
+        lens_info_arg <- stringi::stri_join(
+          "-LensInfo=", min_fl, " ", max_fl, " ", max_ap, " ", max_ap
+        )
+      }
+    }
+
+    all_args <- c(shot_args, lens_info_arg, extra_args)
 
     if (isTRUE(overwrite_original)) {
       all_args <- c("-overwrite_original", all_args)
