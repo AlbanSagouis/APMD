@@ -63,7 +63,7 @@ insert_missing_records <- function(metadata, row_indices, new_rows,
 
     metadata <- data.table::rbindlist(
       list(
-        metadata[seq(from = 1L, to = I - 1L)],
+        metadata[seq_len(I - 1L)],
         new_row,
         metadata[seq(from = I, to = nrow(metadata))]
       ),

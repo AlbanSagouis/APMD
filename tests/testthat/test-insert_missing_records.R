@@ -110,6 +110,14 @@ test_that("insert_missing_records with extrapolate_data=TRUE preserves matching 
   expect_equal(result$Easting[[2L]], "E")
 })
 
+test_that("insert_missing_records inserts at row 1 without duplicating existing rows", {
+  new_row <- data.frame(NO = "01", SS = "500", A = "4")
+  result <- insert_missing_records(make_metadata(), 1L, new_row)
+  expect_equal(nrow(result), 4L)
+  expect_equal(result$SS[[1L]], "500")  # new row is first
+  expect_equal(result$SS[[2L]], "250")  # original row 1 is now second
+})
+
 test_that("insert_missing_records with extrapolate_data=FALSE leaves geo columns as NA", {
   metadata <- data.table::data.table(
     NO = c("01", "02", "03"),
