@@ -1,6 +1,6 @@
-test_that("parsing_nossaflex returns a data.table", {
+test_that("parsing_nossaflex returns a data.frame", {
   result <- parsing_nossaflex(c("NO01_SS125_A5.6_FL50_EX0"))
-  expect_s3_class(result, "data.table")
+  expect_s3_class(result, "data.frame")
 })
 
 test_that("parsing_nossaflex extracts correct column names from standard format", {

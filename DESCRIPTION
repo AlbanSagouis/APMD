@@ -1,7 +1,7 @@
 Package: APMD
 Type: Package
 Title: Analog Photography Metadata and 'EXIF' Editing via 'NOSSAFLEX'
-Version: 0.1.9006
+Version: 0.1.9007
 Authors@R: c(
   person("Alban", "Sagouis", role = c("aut", "cre", "cph"),
         email = "sagouis@pm.me",
@@ -10,7 +10,7 @@ Maintainer: Alban Sagouis <sagouis@pm.me>
 Description: Photographs taken on film, developed, and scanned lack
     meaningful metadata, or carry only information from the scanning device
     rather than the original camera.
-    Provides tools to parse file names following the NOSSAFLEX convention
+    APMD provides tools to parse file names following the NOSSAFLEX convention
     (Number, Shutter Speed, Aperture, Focal Length, EXposure) and to
     batch-rename scan files and write shot information into their
     Exchangeable Image File Format (EXIF) slots using 'exiftoolr'.
@@ -25,11 +25,11 @@ Depends: R (>= 4.1.0)
 Imports:
     exiftoolr,
     stringi,
-    data.table,
     dplyr,
     jsonlite,
     checkmate
 Suggests:
+    data.table,
     knitr,
     quarto,
     withr,

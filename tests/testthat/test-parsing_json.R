@@ -1,6 +1,6 @@
-test_that("parsing_json returns a data.table", {
+test_that("parsing_json returns a data.frame", {
   result <- parsing_json(test_path("fixtures", "nossaflex_Vito_70_test-week.txt"))
-  expect_s3_class(result, "data.table")
+  expect_s3_class(result, "data.frame")
 })
 
 test_that("parsing_json has expected columns", {
@@ -68,9 +68,9 @@ test_that("parsing_json errors when apply_corrections is not logical", {
   )
 })
 
-test_that("parsing_frames returns a data.table", {
+test_that("parsing_frames returns a data.frame", {
   result <- parsing_frames(test_path("fixtures", "Berlin_Boat.frames"))
-  expect_s3_class(result, "data.table")
+  expect_s3_class(result, "data.frame")
 })
 
 test_that("parsing_frames has expected core columns", {

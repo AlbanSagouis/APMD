@@ -1,6 +1,6 @@
-test_that("parsing_csv returns a data.table", {
+test_that("parsing_csv returns a data.frame", {
   result <- parsing_csv(test_path("fixtures", "analog_plus_test.csv"))
-  expect_s3_class(result, "data.table")
+  expect_s3_class(result, "data.frame")
 })
 
 test_that("parsing_csv has expected columns", {

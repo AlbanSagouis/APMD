@@ -2,12 +2,12 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "APMD",
-  "description": "Photographs taken on film, developed, and scanned lack meaningful metadata, or carry only information from the scanning device rather than the original camera. Provides tools to parse file names following the NOSSAFLEX convention (Number, Shutter Speed, Aperture, Focal Length, EXposure) and to batch-rename scan files and write shot information into their Exchangeable Image File Format (EXIF) slots using 'exiftoolr'. Also accepts shot data in JavaScript Object Notation (JSON) format as exported by the 'analog' and 'Frames' apps, or in CSV format as exported by the 'Datafilm' app, allowing photographers to record metadata in the field and process it in 'R'.",
+  "description": "Photographs taken on film, developed, and scanned lack meaningful metadata, or carry only information from the scanning device rather than the original camera. APMD provides tools to parse file names following the NOSSAFLEX convention (Number, Shutter Speed, Aperture, Focal Length, EXposure) and to batch-rename scan files and write shot information into their Exchangeable Image File Format (EXIF) slots using 'exiftoolr'. Also accepts shot data in JavaScript Object Notation (JSON) format as exported by the 'analog' and 'Frames' apps, or in CSV format as exported by the 'Datafilm' app, allowing photographers to record metadata in the field and process it in 'R'.",
   "name": "APMD: Analog Photography Metadata and 'EXIF' Editing via 'NOSSAFLEX'",
   "codeRepository": "https://github.com/albansagouis/APMD/",
   "issueTracker": "https://github.com/albansagouis/APMD/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.9006",
+  "version": "0.1.9007",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -42,6 +42,18 @@
     }
   ],
   "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "data.table",
+      "name": "data.table",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=data.table"
+    },
     {
       "@type": "SoftwareApplication",
       "identifier": "knitr",
@@ -125,18 +137,6 @@
     },
     "4": {
       "@type": "SoftwareApplication",
-      "identifier": "data.table",
-      "name": "data.table",
-      "provider": {
-        "@id": "https://cran.r-project.org",
-        "@type": "Organization",
-        "name": "Comprehensive R Archive Network (CRAN)",
-        "url": "https://cran.r-project.org"
-      },
-      "sameAs": "https://CRAN.R-project.org/package=data.table"
-    },
-    "5": {
-      "@type": "SoftwareApplication",
       "identifier": "dplyr",
       "name": "dplyr",
       "provider": {
@@ -147,7 +147,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=dplyr"
     },
-    "6": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -159,7 +159,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "7": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "checkmate",
       "name": "checkmate",
@@ -175,7 +175,7 @@
   },
   "applicationCategory": "Multimedia",
   "keywords": ["analogphotography", "filmphotography", "EXIF", "metadata", "NOSSAFLEX", "photorenaming", "filmcamera", "data-management", "exif-metadata", "photography", "r", "analog-photography", "weekend-project"],
-  "fileSize": "249.545KB",
+  "fileSize": "250.26KB",
   "releaseNotes": "https://github.com/albansagouis/APMD/blob/master/NEWS.md",
   "readme": "https://github.com/AlbanSagouis/APMD/blob/main/README.md",
   "contIntegration": "https://github.com/AlbanSagouis/APMD/actions/workflows/R-CMD-check.yaml",

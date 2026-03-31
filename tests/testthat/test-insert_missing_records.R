@@ -1,15 +1,15 @@
 make_metadata <- function() {
-  data.table::data.table(
+  data.frame(
     NO = c("01", "02", "03"),
     SS = c("250", "125", "60"),
-    A  = c("5.6", "8", "11")
+    A  = c("5.6", "8", "11"),
+    stringsAsFactors = FALSE
   )
 }
 
-test_that("insert_missing_records rejects non-data.table metadata", {
-  metadata <- as.data.frame(make_metadata())
+test_that("insert_missing_records accepts plain data.frame metadata", {
   new_row <- data.frame(NO = "02", SS = "250", A = "5.6")
-  expect_error(insert_missing_records(metadata, 2L, new_row))
+  expect_no_error(insert_missing_records(make_metadata(), 2L, new_row))
 })
 
 test_that("insert_missing_records rejects row_indices below 1", {
@@ -72,14 +72,15 @@ test_that("insert_missing_records preserves unaffected rows", {
 })
 
 make_geo_metadata <- function() {
-  data.table::data.table(
-    NO                = c("01", "02", "03"),
-    SS                = c("250", "125", "60"),
+  data.frame(
+    NO                 = c("01", "02", "03"),
+    SS                 = c("250", "125", "60"),
     Date_Time_Original = c("2024-01-01 10:00:00", "2024-01-02 12:00:00", "2024-01-03 14:00:00"),
-    Latitude          = c("52.0", "52.5", "53.0"),
-    Longitude         = c("13.0", "13.5", "14.0"),
-    Northing          = c("N", "N", "N"),
-    Easting           = c("E", "E", "E")
+    Latitude           = c("52.0", "52.5", "53.0"),
+    Longitude          = c("13.0", "13.5", "14.0"),
+    Northing           = c("N", "N", "N"),
+    Easting            = c("E", "E", "E"),
+    stringsAsFactors   = FALSE
   )
 }
 
@@ -119,13 +120,14 @@ test_that("insert_missing_records inserts at row 1 without duplicating existing 
 })
 
 test_that("insert_missing_records with extrapolate_data=FALSE leaves geo columns as NA", {
-  metadata <- data.table::data.table(
-    NO = c("01", "02", "03"),
+  metadata <- data.frame(
+    NO                 = c("01", "02", "03"),
     Date_Time_Original = c("2024-01-01 10:00:00", "2024-01-01 12:00:00", "2024-01-01 14:00:00"),
-    Latitude  = c("52.0", "52.5", "53.0"),
-    Longitude = c("13.0", "13.5", "14.0"),
-    Northing  = c("N", "N", "N"),
-    Easting   = c("E", "E", "E")
+    Latitude           = c("52.0", "52.5", "53.0"),
+    Longitude          = c("13.0", "13.5", "14.0"),
+    Northing           = c("N", "N", "N"),
+    Easting            = c("E", "E", "E"),
+    stringsAsFactors   = FALSE
   )
   new_row <- data.frame(NO = "02")
   result <- insert_missing_records(metadata, 2L, new_row, extrapolate_data = FALSE)

@@ -2,7 +2,7 @@
 % Please edit documentation in R/insert_missing_records.R
 \name{insert_missing_records}
 \alias{insert_missing_records}
-\title{Insert rows in metadata data.tables}
+\title{Insert rows in metadata data.frames}
 \usage{
 insert_missing_records(
   metadata,
@@ -18,7 +18,7 @@ insert_missing_records(
 \item{row_indices}{An integer or integer vector of row numbers where new
 rows should be inserted (before the row at that position).}
 
-\item{new_rows}{A data.frame or data.table with column names matching names
+\item{new_rows}{A data.frame with column names matching names
 in `metadata` and values to insert, e.g. Roll_Name and Camera_Brand.
 Must have the same number of rows as `row_indices`.}
 
@@ -27,7 +27,7 @@ computes average Date_Time_Original, Latitude and Longitude values. Hence
 works only with JSON data.}
 }
 \description{
-Insert rows in metadata data.tables
+Insert rows in metadata data.frames
 }
 \examples{
 metadata <- reading_nossaflex(
