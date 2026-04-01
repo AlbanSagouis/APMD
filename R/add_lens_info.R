@@ -83,7 +83,7 @@ add_lens_data_nikon_AF_50_D <- function() {
     `Nikon:MaxApertureAtMaxFocal` = 1.414,
     `Nikon:MCUVersion` = 70,
     `Nikon:LensType` = 2,
-    `Nikon:LensSpec` = "25 50 1.4 1.4 2",
+    `Nikon:LensSpec` = "50 50 1.4 1.4 2",
     `Nikon:LensID` = "AF Nikkor 50mm f/1.4D",
     check.names = FALSE
   )
@@ -136,11 +136,11 @@ add_lens_data_sigma_AF_28_70_D <- function() {
     `Nikon:LensFStops` = 5.833, # checked
     `Nikon:MinFocalLength` = 28.28, # checked
     `Nikon:MaxFocalLength` = 71.27, # checked
-    `Nikon:MaxApertureAtMinFocal` = 2.828, # checked
-    `Nikon:MaxApertureAtMaxFocal` = 2.828, # checked
+    `Nikon:MaxApertureAtMinFocal` = 2.9, # checked
+    `Nikon:MaxApertureAtMaxFocal` = 2.9, # checked
     `Nikon:MCUVersion` = 2, # checked
     `Nikon:LensType` = 0, # checked
-    `Nikon:LensSpec` = "28 70 2.8 2.8 0",
+    `Nikon:LensSpec` = "28 70 2.9 2.9 0",
     # `Nikon:LensID` = "02 46 3C 5C 25 25 02 00",
     `Nikon:LensID` = "Sigma 28-70mm F2.8",
     check.names = FALSE

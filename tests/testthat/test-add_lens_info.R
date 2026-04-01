@@ -100,3 +100,16 @@ test_that("delete_lens_data returns empty strings for all fields", {
   result <- delete_lens_data()
   expect_true(all(vapply(result, function(x) x == "", logical(1L))))
 })
+
+test_that("add_lens_data_nikon_AF_50_D LensSpec first element matches MinFocalLength", {
+  result <- add_lens_data_nikon_AF_50_D()
+  spec_min_fl <- as.numeric(strsplit(result[["Nikon:LensSpec"]], " ")[[1L]][[1L]])
+  expect_equal(spec_min_fl, 50)
+})
+
+test_that("add_lens_data_sigma_AF_28_70_D LensSpec apertures match stored aperture fields", {
+  result <- add_lens_data_sigma_AF_28_70_D()
+  spec_parts <- as.numeric(strsplit(result[["Nikon:LensSpec"]], " ")[[1L]])
+  expect_equal(spec_parts[[3L]], result[["Nikon:MaxApertureAtMinFocal"]])
+  expect_equal(spec_parts[[4L]], result[["Nikon:MaxApertureAtMaxFocal"]])
+})

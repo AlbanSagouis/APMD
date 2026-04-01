@@ -90,17 +90,17 @@ editing_exif <- function(
     "Lens_Max_Focal_Length",
     "Lens_Maximum_Aperture",
     "Lens_Serial_Number",
-    # Nikon lens (encrypted MakerNote — not writable by exiftool)
-    #"Nikon:LensIDNumber",
-    #"Nikon:LensFStops",
-    #"Nikon:MinFocalLength",
-    #"Nikon:MaxFocalLength",
-    #"Nikon:MaxApertureAtMinFocal",
-    #"Nikon:MaxApertureAtMaxFocal",
-    #"Nikon:MCUVersion",
-    #"Nikon:LensType",
+    # Nikon lens MakerNote — writable on D3000 (verified 2026-04-01)
+    "Nikon:LensIDNumber",
+    "Nikon:LensFStops",
+    "Nikon:MinFocalLength",
+    "Nikon:MaxFocalLength",
+    "Nikon:MaxApertureAtMinFocal",
+    "Nikon:MaxApertureAtMaxFocal",
+    "Nikon:MCUVersion",
+    "Nikon:LensType",
     #"Nikon:LensSpec", # composite
-    #"Nikon:LensID", # composite
+    #"Nikon:LensID",   # composite
     # "Lens_ID", # composite
     # Film stock
     "Stock",
@@ -137,17 +137,17 @@ editing_exif <- function(
     "MaxFocalLength",
     "MaxApertureValue",
     "LensSerialNumber",
-    # Nikon lens (encrypted MakerNote — not writable by exiftool)
-    #"Nikon:LensIDNumber",
-    #"Nikon:LensFStops",
-    #"Nikon:MinFocalLength",
-    #"Nikon:MaxFocalLength",
-    #"Nikon:MaxApertureAtMinFocal",
-    #"Nikon:MaxApertureAtMaxFocal",
-    #"Nikon:MCUVersion",
-    #"Nikon:LensType",
+    # Nikon lens MakerNote (identity mapping — column name = tag name)
+    "Nikon:LensIDNumber",
+    "Nikon:LensFStops",
+    "Nikon:MinFocalLength",
+    "Nikon:MaxFocalLength",
+    "Nikon:MaxApertureAtMinFocal",
+    "Nikon:MaxApertureAtMaxFocal",
+    "Nikon:MCUVersion",
+    "Nikon:LensType",
     #"Nikon:LensSpec", # composite
-    #"Nikon:LensID", # composite
+    #"Nikon:LensID",   # composite
     # "LensID", # composite
     # Film stock
     "ImageDescription",
@@ -163,7 +163,7 @@ editing_exif <- function(
   # Converting values ----
   ## Excluding "auto" values ----
   variables <- c("SS", "FL", "A")
-  if (any(select(metadata, any_of(variables)) == "auto")) {
+  if (any(unlist(select(metadata, any_of(variables))) == "auto")) {
     message('"auto" values in SS, A and FL are turned into "".')
     metadata <- mutate(
       metadata,
@@ -212,12 +212,13 @@ editing_exif <- function(
 
   ## ShutterSpeedValue APEX ----
   # APEX = log2(1 / ExposureTime); derived from ExposureTime (already in decimal seconds)
+  exposure_time <- metadata[["ExposureTime"]]
   if ("SS" %in% names(metadata)) {
     metadata <- mutate(
       metadata,
       SS = if_else(
-        !is.na(ExposureTime) & ExposureTime != "",
-        as.character(log2(1 / as.numeric(ExposureTime))),
+        !is.na(exposure_time) & exposure_time != "",
+        as.character(log2(1 / as.numeric(exposure_time))),
         ""
       )
     )
@@ -241,19 +242,21 @@ editing_exif <- function(
 
     arguments <- stats::setNames(object = arguments, exif_names[matched_idx])
 
-    shot_args <- sapply(
+    shot_args <- vapply(
       seq_along(arguments),
       function(j) {
         stringi::stri_join("-", names(arguments)[[j]], "=", arguments[[j]])
-      }
+      },
+      FUN.VALUE = character(1L)
     )
 
     extra_args <- if (!is.null(extra_tags)) {
-      sapply(
+      vapply(
         seq_along(extra_tags),
         function(j) {
           stringi::stri_join("-", names(extra_tags)[[j]], "=", extra_tags[[j]])
-        }
+        },
+        FUN.VALUE = character(1L)
       )
     }
 
@@ -281,7 +284,9 @@ editing_exif <- function(
       all_args <- c("-v2", all_args)
     }
 
-    print(all_args)
+    if (isTRUE(verbose)) {
+      print(all_args)
+    }
 
     exiftoolr::exif_call(path = files[[i]], args = all_args, quiet = FALSE)
   }

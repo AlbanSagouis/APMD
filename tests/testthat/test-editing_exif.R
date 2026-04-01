@@ -137,6 +137,61 @@ test_that("editing_exif writes extra_tags to file", {
   expect_equal(result[["Artist"]], "Jane Smith")
 })
 
+# Lens fields ----
+
+test_that("editing_exif writes LensModel and LensMake", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  metadata <- data.frame(
+    SS = "250", A = "2.8", FL = "24",
+    Lens_Brand = "Nikon",
+    Lens_Model = "AF Nikkor 24mm f/2.8D"
+  )
+  editing_exif(files = jpg, metadata = metadata, overwrite_original = TRUE, verbose = FALSE)
+
+  result <- exiftoolr::exif_read(jpg)
+  expect_equal(result[["LensModel"]], "AF Nikkor 24mm f/2.8D")
+  expect_equal(result[["LensMake"]], "Nikon")
+})
+
+test_that("editing_exif writes LensInfo from focal length and aperture columns", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  metadata <- data.frame(
+    SS = "250", A = "2.8", FL = "28",
+    Lens_Model = "AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF",
+    Lens_Focal_Length = 28,
+    Lens_Max_Focal_Length = 105,
+    Lens_Maximum_Aperture = 3.6
+  )
+  editing_exif(files = jpg, metadata = metadata, overwrite_original = TRUE, verbose = FALSE)
+
+  result <- exiftoolr::exif_read(jpg)
+  expect_equal(result[["LensModel"]], "AF Zoom-Nikkor 28-105mm f/3.5-4.5D IF")
+  expect_false(is.null(result[["LensInfo"]]))
+})
+
+# verbose ----
+
+test_that("editing_exif with verbose=FALSE does not print args", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  expect_no_message(
+    expect_output(
+      editing_exif(
+        files = jpg,
+        metadata = make_exif_metadata(),
+        overwrite_original = TRUE,
+        verbose = FALSE
+      ),
+      NA  # no output expected
+    )
+  )
+})
+
 test_that("editing_exif with overwrite_original=FALSE creates a backup", {
   tmp <- withr::local_tempdir()
   jpg <- make_jpg_copy(tmp)
@@ -148,4 +203,33 @@ test_that("editing_exif with overwrite_original=FALSE creates a backup", {
     verbose = FALSE
   )
   expect_true(file.exists(paste0(jpg, "_original")))
+})
+
+# add_lens_data_*() integration ----
+
+test_that("add_lens_data_nikon_AF_24_D integrates with editing_exif to write LensModel", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  metadata <- cbind(
+    data.frame(SS = "125", A = "2.8", FL = "24", Lens_Model = "AF Nikkor 24mm f/2.8D"),
+    add_lens_data_nikon_AF_24_D()
+  )
+  editing_exif(files = jpg, metadata = metadata, overwrite_original = TRUE, verbose = FALSE)
+
+  result <- exiftoolr::exif_read(jpg)
+  expect_equal(result[["LensModel"]], "AF Nikkor 24mm f/2.8D")
+})
+
+test_that("delete_lens_data integrates with editing_exif without error", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  metadata <- cbind(
+    data.frame(SS = "125", A = "2.8", FL = "24"),
+    delete_lens_data()
+  )
+  expect_no_error(
+    editing_exif(files = jpg, metadata = metadata, overwrite_original = TRUE, verbose = FALSE)
+  )
 })
