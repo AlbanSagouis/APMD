@@ -75,6 +75,19 @@ test_that("editing_exif writes FocalLength and DateTimeOriginal from a data.tabl
   expect_equal(result[["DateTimeOriginal"]], "2024:03:19 12:00:00")
 })
 
+# Aperture ----
+
+test_that("editing_exif writes FNumber from A column", {
+  tmp <- withr::local_tempdir()
+  jpg <- make_jpg_copy(tmp)
+
+  metadata <- data.frame(SS = "250", A = "2.8", FL = "50")
+  editing_exif(files = jpg, metadata = metadata, overwrite_original = TRUE, verbose = FALSE)
+
+  result <- exiftoolr::exif_read(jpg)
+  expect_equal(result[["FNumber"]], 2.8)
+})
+
 # SS format handling ----
 
 test_that("editing_exif writes ExposureTime=0.004 for SS fraction '1/250'", {

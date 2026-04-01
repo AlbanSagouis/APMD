@@ -115,7 +115,7 @@ editing_exif <- function(
     "ShutterSpeedValue",
     #"ShutterSpeed", # not writable
     "ExposureTime",
-    "Aperture",
+    "FNumber",
     "FNumber",
     "FocalLength",
     "FocalLengthIn35mmFormat",
