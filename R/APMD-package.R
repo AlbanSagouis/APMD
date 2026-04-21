@@ -7,4 +7,12 @@
 "_PACKAGE"
 .datatable.aware <- TRUE
 
+.onAttach <- function(libname, pkgname) {
+  packageStartupMessage(
+    "APMD v",
+    utils::packageVersion("APMD"),
+    " - Analog Photography MetaData"
+  )
+}
+
 NULL

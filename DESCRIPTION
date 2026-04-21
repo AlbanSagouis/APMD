@@ -1,7 +1,7 @@
 Package: APMD
 Type: Package
 Title: Analog Photography Metadata and 'EXIF' Editing via 'NOSSAFLEX'
-Version: 0.1.9008
+Version: 0.1.9009
 Authors@R: c(
   person("Alban", "Sagouis", role = c("aut", "cre", "cph"),
         email = "sagouis@pm.me",

@@ -12,4 +12,5 @@
 ^\.github$
 ^\.agents$
 ^doc$
+^docs$
 ^Meta$
