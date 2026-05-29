@@ -95,11 +95,7 @@ install.packages("APMD")
 Or the development version from GitHub with:
 
 ``` r
-remotes::install_github(
-    repo = "AlbanSagouis/APMD@dev",
-    build_manual = TRUE,
-    build_vignettes = TRUE
-)
+pak::pkg_install("AlbanSagouis/APMD@dev")
 ```
 
 ### Usage

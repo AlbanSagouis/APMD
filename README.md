@@ -10,7 +10,7 @@
 state and is being actively
 developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 ![Code Coverage:
-98%](https://img.shields.io/badge/code_coverage-98%25-brightgreen)
+97%](https://img.shields.io/badge/code_coverage-97%25-brightgreen)
 <!-- badges: end -->
 
 ## Analog Photography MetaData
@@ -70,11 +70,7 @@ install.packages("APMD")
 Or the development version from GitHub with:
 
 ``` r
-remotes::install_github(
-    repo = "AlbanSagouis/APMD@dev",
-    build_manual = TRUE,
-    build_vignettes = TRUE
-)
+pak::pkg_install("AlbanSagouis/APMD@dev")
 ```
 
 ### Usage
